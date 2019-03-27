@@ -61,6 +61,12 @@ public class Project {
 		FileUtils.copyDirectory(originalDir,workingDir);
 
 		tests = loadTests();
+		if(tests == null) {
+			tests = new HashMap<>();
+			for(String cl: classesToRun) {
+				tests.put(cl, "*");
+			}
+		}
 
 		//mvn compile original
 		compile(originalDir);
@@ -130,9 +136,11 @@ public class Project {
 			request.setBatchMode(true);
 			request.setPomFile(pomFile);
 			request.setGoals(Collections.singletonList("test"));
-			Properties properties = new Properties();
-			properties.setProperty("test", tests);
-			request.setProperties(properties);
+			if(tests.equalsIgnoreCase("*")) {
+				Properties properties = new Properties();
+				properties.setProperty("test", tests);
+				request.setProperties(properties);
+			}
 
 			request.getOutputHandler(s -> System.out.println(s));
 			request.getErrorHandler(s -> System.out.println(s));
@@ -187,23 +195,28 @@ public class Project {
 	}
 
 	public Map<String, String> loadTests() throws JSONException, IOException {
-		tests = new HashMap<>();
-		String jsonString = FileUtils.readFileToString(new File(originalDir, "tie-report.json"));
+		try {
+			tests = new HashMap<>();
+			String jsonString = FileUtils.readFileToString(new File(originalDir, "tie-report.json"));
 
-		JSONObject testRaw = new JSONObject(jsonString);
-		JSONArray classList = testRaw.getJSONArray("methodList");
-		for(int i = 0; i < classList.length(); i++) {
-			JSONObject cl = classList.getJSONObject(i);
-			String clName = cl.getString("method").replace(".","/");
-			JSONArray clTests = cl.getJSONArray("called-in");
-			String testList = "";
-			for(int j = 0; j < clTests.length(); j++) {
-				if(j != 0) testList += ",";
-				testList += clTests.getString(j);
+			JSONObject testRaw = new JSONObject(jsonString);
+			JSONArray classList = testRaw.getJSONArray("methodList");
+			for (int i = 0; i < classList.length(); i++) {
+				JSONObject cl = classList.getJSONObject(i);
+				String clName = cl.getString("method").replace(".", "/");
+				JSONArray clTests = cl.getJSONArray("called-in");
+				String testList = "";
+				for (int j = 0; j < clTests.length(); j++) {
+					if (j != 0) testList += ",";
+					testList += clTests.getString(j);
+				}
+				tests.put(clName, testList);
 			}
-			tests.put(clName, testList);
+			return tests;
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
 		}
-		return tests;
+		return null;
 	}
 
 	public List<String> getClasses() {

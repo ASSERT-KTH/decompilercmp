@@ -2,7 +2,7 @@
 
 The aim of this project is compare the different java decompiler currently available. To do so it use a java maven project for which the sources are provided and attempt to decompile recompile classes one by one.
 
-Prerequisites:
+Optional Prerequisites:
  * run [yajta](https://github.com/castor-software/yajta) in Tie mode to collect information on which tests to run for each class. (Put the `tie-report.json` in the root of the targeted project).
 
 Usage:
