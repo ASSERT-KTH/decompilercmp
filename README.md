@@ -21,11 +21,11 @@ Output (`projectName-decompiler-report.csv`):
 Class,isDecompilable,distanceToOriginal,isRecompilable,passTests
 ```
 
-*Class*: Class name
-*isDecompilable*: has the decompiler sucessuflly produced a java file for the given class?
-*distanceToOriginal*: Number of edit operation needed on the original AST to obtain the decompiled AST. (Integer.MIN_VALUE if the evaluation failed)
-*isRecompilable*: can the decompiled java code be recompiled?
-*passTests*: do the tests of the project still pass after decompilation/recompilation of the class.
+ * **Class**: Class name
+ * **isDecompilable**: has the decompiler sucessuflly produced a java file for the given class?
+ * **distanceToOriginal**: Number of edit operation needed on the original AST to obtain the decompiled AST. (Integer.MIN_VALUE if the evaluation failed)
+ * **isRecompilable**: can the decompiled java code be recompiled?
+ * **passTests**: do the tests of the project still pass after decompilation/recompilation of the class.
 
 
 AST comparator is shamelessly copied from [gumtree-spoon-ast-diff](https://github.com/SpoonLabs/gumtree-spoon-ast-diff).
