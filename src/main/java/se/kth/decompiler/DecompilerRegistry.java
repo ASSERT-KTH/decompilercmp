@@ -11,5 +11,6 @@ public class DecompilerRegistry {
 		decompilers = new HashMap<>();
 		decompilers.put("CFR-0.141", new CFR());
 		decompilers.put("Fernflower-2.5.0.Final", new Fernflower());
+		decompilers.put("Krakatau", new Krakatau());
 	}
 }

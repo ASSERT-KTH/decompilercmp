@@ -136,7 +136,7 @@ public class Project {
 			request.setBatchMode(true);
 			request.setPomFile(pomFile);
 			request.setGoals(Collections.singletonList("test"));
-			if(tests.equalsIgnoreCase("*")) {
+			if(!tests.equalsIgnoreCase("*")) {
 				Properties properties = new Properties();
 				properties.setProperty("test", tests);
 				request.setProperties(properties);
@@ -196,7 +196,7 @@ public class Project {
 
 	public Map<String, String> loadTests() throws JSONException, IOException {
 		try {
-			tests = new HashMap<>();
+			Map<String, String> tests = new HashMap<>();
 			String jsonString = FileUtils.readFileToString(new File(originalDir, "tie-report.json"));
 
 			JSONObject testRaw = new JSONObject(jsonString);
