@@ -34,6 +34,13 @@
       <systemPath>${basedir}/lib/jd-gui-1.4.1.jar</systemPath>
     </dependency>
     <dependency>
+      <groupId>org.jode</groupId>
+      <artifactId>jode-decompiler</artifactId>
+      <version>1.2.1-pre1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/jode-1.1.2-pre1.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>org.bitbucket.mstrobel</groupId>
       <artifactId>procyon-compilertools</artifactId>
       <version>0.5.34</version>
