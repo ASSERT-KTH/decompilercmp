@@ -1,6 +1,7 @@
 ### Java
 # Compiled class file
 *.class
+!DiffImpl.class
 
 # Log file
 *.log
