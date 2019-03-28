@@ -46,13 +46,13 @@ public class Project {
 		projectName = originalDir.getName();
 	}
 
-	public void run(Decompiler dc) throws IOException, JSONException {
+	public void run(Decompiler dc, File outputDir) throws IOException, JSONException {
 		classes = getClasses();
-		run(dc,classes);
+		run(dc,classes, outputDir);
 	}
 
 
-	public void run(Decompiler dc, List<String> classesToRun) throws IOException, JSONException {
+	public void run(Decompiler dc, List<String> classesToRun, File outputDir) throws IOException, JSONException {
 		workingDir = new File(tmpDir, originalDir.getName());
 		if (workingDir.exists()) {
 			FileUtils.deleteDirectory(workingDir);
@@ -71,7 +71,7 @@ public class Project {
 		//mvn compile original
 		compile(originalDir);
 
-		report = new File(projectName + "-" + dc.getName() + "-report.csv");
+		report = new File(outputDir,projectName + "-" + dc.getName() + "-report.csv");
 		FileUtils.write(report,"Class,isDecompilable,distanceToOriginal,isRecompilable,passTests\n",false);
 
 		for(String cl: classesToRun) {

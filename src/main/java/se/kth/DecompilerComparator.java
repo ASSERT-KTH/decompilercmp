@@ -24,6 +24,8 @@ public class DecompilerComparator {
     private String decompilerName = "CFR-0.141";
     @Parameter(names = {"--debug-class", "-c"}, description = "Optional. Run a single class")
     String classToRun;
+    @Parameter(names = {"--output-dir", "-o"}, description = "Path to output directory. Default: report")
+    String outputDirPath = "report";
 
 
     public static void main( String[] args ) throws IOException, JSONException {
@@ -43,6 +45,12 @@ public class DecompilerComparator {
                 System.err.println("Project " + decompilerComparator.projectPath + " not found.");
                 return;
             }
+            File ouputDir = new File(decompilerComparator.outputDirPath);
+            if(ouputDir.exists() && !ouputDir.isDirectory()) {
+                System.err.println("OutputDir " + decompilerComparator.outputDirPath + " is not a directory.");
+                return;
+            }
+            if(!ouputDir.exists()) ouputDir.mkdirs();
 
             Project project = new Project(projectDir.getAbsolutePath());
             Decompiler decompiler = DecompilerRegistry.decompilers.get(decompilerComparator.decompilerName);
@@ -51,9 +59,9 @@ public class DecompilerComparator {
                 return;
             }
             if(decompilerComparator.classToRun != null) {
-                project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun));
+                project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun),ouputDir);
             } else {
-                project.run(decompiler);
+                project.run(decompiler,ouputDir);
             }
         }
     }
