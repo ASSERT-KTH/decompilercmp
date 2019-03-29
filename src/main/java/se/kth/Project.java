@@ -66,7 +66,7 @@ public class Project {
 
         for (String cl : classesToRun) {
             boolean isDecompilable = false;
-            int distance = 0;
+            int distance = Integer.MIN_VALUE;
             boolean isReCompilable = false;
             boolean passTests = false;
 
