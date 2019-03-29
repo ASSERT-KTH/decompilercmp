@@ -9,7 +9,7 @@ public class DavaTest {
 
     Dava dava;
 
-    @Before
+    //@Before
     public void setUp() throws Exception {
 //
 //        System.out.println("classpath");
@@ -20,7 +20,7 @@ public class DavaTest {
         dava = new Dava();
     }
 
-    @Test
+    //@Test
     public void decompileClassFile() {
 
         File in = new File("src/test/resources/DiffImpl.class");

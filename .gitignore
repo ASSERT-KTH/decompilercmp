@@ -37,8 +37,9 @@ buildNumber.properties
 .idea/sonarlint/
 .idea/workspace.xml
 out/
-
+.iml
 
 ### Custom
 lib
 decompiler-cmp.iml
+decompilercmp.iml

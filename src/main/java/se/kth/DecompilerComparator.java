@@ -56,6 +56,10 @@ public class DecompilerComparator {
             Decompiler decompiler = DecompilerRegistry.decompilers.get(decompilerComparator.decompilerName);
             if(decompiler == null) {
                 System.err.println("Error: " + decompilerComparator.decompilerName + " not in the decompiler list.");
+	            System.err.println("Here are the available decompilers:");
+	            for(String dc :DecompilerRegistry.decompilers.keySet()) {
+		            System.out.println("\t\t" + dc);
+	            }
                 return;
             }
             if(decompilerComparator.classToRun != null) {
