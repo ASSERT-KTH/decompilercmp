@@ -1,0 +1,95 @@
+---
+title: "Descriptive Analysis"
+output: html_notebook
+---
+
+This notebook shows descriptive statistics of the results obtained with the decompilers. 
+
+# Load required packages
+
+```{r}
+library(tidyverse)
+library(VennDiagram)
+library(venn)
+theme_set(theme_bw())
+```
+
+# Read the dataset
+
+```{r}
+dataset <- read.csv("data/dataset.csv")
+```
+
+# General summary of the dataset
+
+```{r}
+summary(dataset)
+
+# summary of numeric variables
+dataset %>%
+  dplyr::select(Decompiler, distanceToOriginal) %>%
+  group_by(Decompiler) %>%
+  summarise(
+    min = min(distanceToOriginal),
+    q25 = quantile(distanceToOriginal, 0.25),
+    median = median(distanceToOriginal),
+    q75 = quantile(distanceToOriginal, 0.75),
+    max = max(distanceToOriginal),
+    mean = mean(distanceToOriginal),
+    sd = sd(distanceToOriginal)
+  )
+
+# summary of non-numeric variables
+dataset$isRecompilable <- as.factor(dataset$isRecompilable)
+dataset$passTests <- as.factor(dataset$passTests)
+
+dataset %>%
+  dplyr::select(Decompiler, isRecompilable, passTests) %>%
+  group_by(Decompiler) %>%
+  count(isRecompilable, passTests)
+```
+
+# What is the best decompiler?
+
+### Distribution of distance to original
+
+```{r}
+# Distance to the original
+dataset %>% 
+  filter(Decompiler != "Dava-3.3.0-report.csv") %>% 
+  ggplot(aes(Decompiler, distanceToOriginal)) +
+  geom_boxplot() +
+  coord_flip()
+
+ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+```
+
+### Distribution of non-numeric variables
+
+```{r}
+# Distribution of Recompilable Types for each Decompiler
+dataset %>% 
+  dplyr::select(Decompiler, isRecompilable) %>% 
+  group_by(Decompiler) %>% 
+  count(Recompilable = isRecompilable) %>% 
+  ggplot(aes(Decompiler, n)) +
+  geom_bar(aes(fill = Recompilable), position = "dodge", stat="identity") +
+  ylab("Types") +
+  ggtitle("Distribution of Recompilable Types for each Decompiler") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave(filename = "figures/recompilable.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+
+# Distribution of tests results for each Decompiler
+dataset %>% 
+  dplyr::select(Decompiler, passTests) %>% 
+  group_by(Decompiler) %>% 
+  count(PassTests = passTests) %>% 
+  ggplot(aes(Decompiler, n)) +
+  geom_bar(aes(fill = PassTests), position = "dodge", stat="identity") +
+  ylab("Tests") +
+  ggtitle("Distribution of Tests Results for each Decompiler") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave(filename = "figures/testable.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+```
