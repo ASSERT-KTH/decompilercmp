@@ -14,7 +14,7 @@ public class DecompilerRegistry {
 		decompilers.put("Krakatau", new Krakatau());
 		decompilers.put("Procyon-0.5.34", new Procyon());
 		decompilers.put("Dava-3.3.0", new Dava());
-		//decompilers.put("JD-GUI-1.4.1", new JDGui());
-		//decompilers.put("Jode-1.1.2-pre1", new Jode());
+		decompilers.put("JD-GUI-1.4.1", new JDGui());
+		decompilers.put("Jode-1.1.2-pre1", new Jode());
 	}
 }

@@ -63,7 +63,7 @@ public class DecompilerComparator {
                 return;
             }
             if(decompilerComparator.classToRun != null) {
-                project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun),ouputDir);
+                project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun),ouputDir, false);
             } else {
                 project.run(decompiler,ouputDir);
             }
