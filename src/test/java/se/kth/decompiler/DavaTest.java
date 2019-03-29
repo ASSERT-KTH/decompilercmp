@@ -11,12 +11,12 @@ public class DavaTest {
 
     //@Before
     public void setUp() throws Exception {
-//
-//        System.out.println("classpath");
-//        System.out.println(System.getProperty("java.class.path"));
-//
-//        System.out.println("librarypath");
-//        System.out.println(System.getProperty("java.library.path"));
+
+        System.out.println("classpath");
+        System.out.println(System.getProperty("java.class.path"));
+
+        System.out.println("librarypath");
+        System.out.println(System.getProperty("java.library.path"));
         dava = new Dava();
     }
 

@@ -51,3 +51,5 @@ decompilercmp.iml
 .Rhistory
 .Rapp.history
 .RData
+notebooks/data
+notebooks/figures
