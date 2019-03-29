@@ -63,7 +63,7 @@ public class Project {
 
 
         if(clean) {
-            report = new File(outputDir, projectName + "-" + dc.getName() + "-report.csv");
+            report = new File(outputDir, projectName + ":" + dc.getName() + ":report.csv");
             FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,isRecompilable,passTests\n", false);
         }
 

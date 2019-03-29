@@ -1,0 +1,86 @@
+---
+title: "Venn Diagrams"
+output: html_notebook
+---
+
+This notebook plot Venn Diagrams of the results obtained with the decompilers.
+
+# Load required packages
+
+```{r}
+library(tidyverse)
+library(venn)
+theme_set(theme_bw())
+```
+
+# Read the dataset
+
+```{r}
+dataset <- read.csv("data/dataset.csv")
+```
+
+# Venn Diagrams
+
+### Venn Diagram of recompilable classes
+
+```{r}
+a <- dataset %>% 
+  filter(Decompiler == "CFR-0.141-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+b <- dataset %>% 
+  filter(Decompiler == "Procyon-0.5.34-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+c <- dataset %>% 
+  filter(Decompiler == "JD-GUI-1.4.1-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+d <- dataset %>% 
+  filter(Decompiler == "Jode-1.1.2-pre1-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+e <- dataset %>% 
+  filter(Decompiler == "Krakatau-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+f <- dataset %>% 
+  filter(Decompiler == "Fernflower-2.5.0.Final-report.csv" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class)
+snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower")
+venn(decompilersToPlot, snames = snames, ilab=TRUE, zcolor = "style")
+```
+
+### Venn Diagram of tests that pass
+
+```{r}
+a <- dataset %>% 
+  filter(Decompiler == "CFR-0.141-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+b <- dataset %>% 
+  filter(Decompiler == "Procyon-0.5.34-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+c <- dataset %>% 
+  filter(Decompiler == "JD-GUI-1.4.1-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+d <- dataset %>% 
+  filter(Decompiler == "Jode-1.1.2-pre1-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+e <- dataset %>% 
+  filter(Decompiler == "Krakatau-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+f <- dataset %>% 
+  filter(Decompiler == "Fernflower-2.5.0.Final-report.csv" & passTests == "TRUE") %>% 
+  select(Class)
+
+decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class)
+snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower")
+venn(decompilersToPlot, snames = snames, ilab=TRUE, zcolor = "style")
+```

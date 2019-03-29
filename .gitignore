@@ -43,3 +43,13 @@ out/
 lib
 decompiler-cmp.iml
 decompilercmp.iml
+
+### R
+*.Rproj
+*.nb.html
+.Rproj.user/
+.Rhistory
+.Rapp.history
+.RData
+notebooks/data
+notebooks/figures
