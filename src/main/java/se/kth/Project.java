@@ -83,7 +83,7 @@ public class Project {
             }
 
             //report
-            report(cl, isDecompilable, distance, isReCompilable, passTests);
+            report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NaN" : ("" + passTests));
 
             //clean up
             restore(cl);
@@ -179,7 +179,7 @@ public class Project {
         return new GumtreeASTDiff().compare(src, nsrc);
     }
 
-    public void report(String cl, boolean isDecompilable, int distance, boolean isRecompilable, boolean passTests) throws IOException {
+    public void report(String cl, boolean isDecompilable, int distance, boolean isRecompilable, String passTests) throws IOException {
         FileUtils.write(report, cl + "," + isDecompilable + "," + distance + "," + isRecompilable + "," + passTests + "\n", true);
         System.out.println("Class " + cl + " dc: " + isDecompilable + ", dist: " + distance + ", rc: " + isRecompilable + ", tests: " + passTests);
     }
