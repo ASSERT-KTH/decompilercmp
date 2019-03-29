@@ -1,0 +1,48 @@
+---
+title: "Data Preprocessing "
+output: html_notebook
+---
+
+This notebook preprocess the results of the decompilers and builds a dataset with all of them.
+
+### Load required packages
+
+```{r}
+library(tidyverse)
+```
+
+### Preprocess the data to get the full tidy dataset with all decompilers' results
+
+```{r}
+# go to parent directory
+setwd("..")
+reportsDir <- paste(getwd(), "/report/", sep = "")
+# list files of results
+fileList = list.files(
+  path = reportsDir,
+  pattern = "*.csv"
+  )
+
+# final dataset
+dataset <- data.frame(matrix(ncol = 7, nrow = 0))
+colnames(dataset) <- c("Project", "Decompiler", "Class", "isDecompilable", "distanceToOriginal", "isRecompilable", "passTests")
+
+# read and add all the result files into a dataset 
+for (i in 1:length(fileList)) {
+  projectName <- strsplit(fileList[i], ":")[[1]][1]
+  decompilerName <- strsplit(fileList[i], ":")[[1]][2]
+  individualReport <- read_csv(paste(reportsDir, fileList[i], sep = ""), col_names = T)
+  individualReport$Project <- projectName
+  individualReport$Decompiler <- decompilerName
+  dataset <- dplyr::bind_rows(dataset, individualReport)
+}
+```
+
+### Save the dataset
+
+```{r}
+write.csv(write.csv(dataset, file = "data/dataset.csv", row.names = F))
+```
+
+
+
