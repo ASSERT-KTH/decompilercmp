@@ -1,7 +1,8 @@
 #!/bin/bash
 
 CONFIG=$(<$1)
-YAJTA="/home/nharrand/Documents/yajta/script/tie.sh /home/nharrand/Documents/yajta/target/yajta-2.0.0-jar-with-dependencies.jar"
+YAJTA_DIR=$2
+YAJTA="$YAJTA_DIR/script/tie.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
 
 
 for o in $(echo $CONFIG | jq -c '.[]')
