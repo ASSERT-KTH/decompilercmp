@@ -38,11 +38,11 @@ public class Project {
 
     public void run(Decompiler dc, File outputDir) throws IOException, JSONException {
         classes = getClasses();
-        run(dc, classes, outputDir);
+        run(dc, classes, outputDir, true);
     }
 
 
-    public void run(Decompiler dc, List<String> classesToRun, File outputDir) throws IOException, JSONException {
+    public void run(Decompiler dc, List<String> classesToRun, File outputDir, boolean clean) throws IOException, JSONException {
         workingDir = new File(tmpDir, originalDir.getName());
         if (workingDir.exists()) {
             FileUtils.deleteDirectory(workingDir);
@@ -83,10 +83,12 @@ public class Project {
             }
 
             //report
-            report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NaN" : ("" + passTests));
+            if(clean)
+                report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NA" : ("" + passTests));
 
             //clean up
-            restore(cl);
+            if(clean)
+                restore(cl);
         }
     }
 
