@@ -2,7 +2,7 @@
 
 CONFIG=$(<$1)
 YAJTA_DIR=$2
-YAJTA="$YAJTA_DIR/script/tie.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
+YAJTA="$YAJTA_DIR/script/tie-maven.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
 
 
 for o in $(echo $CONFIG | jq -c '.[]')
@@ -16,7 +16,6 @@ do
 	cd $REPO
 	git reset --hard $COMMIT
 	mvn install
-	TORUN=$(echo "$YAJTA $PACKAGES")
-	eval $TORUN
+	eval $YAJTA
 	cd ..
 done
