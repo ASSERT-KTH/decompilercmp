@@ -24,32 +24,37 @@ dataset <- read.csv("data/dataset.csv")
 ### Venn Diagram of recompilable classes
 
 ```{r}
+
 a <- dataset %>% 
-  filter(Decompiler == "CFR-0.141-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "CFR-0.141" & isRecompilable == "TRUE") %>% 
   select(Class)
 
 b <- dataset %>% 
-  filter(Decompiler == "Procyon-0.5.34-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "Procyon-0.5.34" & isRecompilable == "TRUE") %>% 
   select(Class)
 
 c <- dataset %>% 
-  filter(Decompiler == "JD-GUI-1.4.1-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "JD-GUI-1.4.1" & isRecompilable == "TRUE") %>% 
   select(Class)
 
 d <- dataset %>% 
-  filter(Decompiler == "Jode-1.1.2-pre1-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "Jode-1.1.2-pre1" & isRecompilable == "TRUE") %>% 
   select(Class)
 
 e <- dataset %>% 
-  filter(Decompiler == "Krakatau-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "Krakatau" & isRecompilable == "TRUE") %>% 
   select(Class)
 
 f <- dataset %>% 
-  filter(Decompiler == "Fernflower-2.5.0.Final-report.csv" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "Fernflower-2.5.0.Final" & isRecompilable == "TRUE") %>% 
   select(Class)
 
-decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower")
+g <- dataset %>% 
+  filter(Decompiler == "Dava-3.3.0" & isRecompilable == "TRUE") %>% 
+  select(Class)
+
+decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class, g$Class)
+snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
 venn(decompilersToPlot, snames = snames, ilab=TRUE, zcolor = "style")
 ```
 
@@ -57,30 +62,34 @@ venn(decompilersToPlot, snames = snames, ilab=TRUE, zcolor = "style")
 
 ```{r}
 a <- dataset %>% 
-  filter(Decompiler == "CFR-0.141-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "CFR-0.141" & passTests == "TRUE") %>% 
   select(Class)
 
 b <- dataset %>% 
-  filter(Decompiler == "Procyon-0.5.34-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "Procyon-0.5.34" & passTests == "TRUE") %>% 
   select(Class)
 
 c <- dataset %>% 
-  filter(Decompiler == "JD-GUI-1.4.1-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "JD-GUI-1.4.1" & passTests == "TRUE") %>% 
   select(Class)
 
 d <- dataset %>% 
-  filter(Decompiler == "Jode-1.1.2-pre1-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "Jode-1.1.2-pre1" & passTests == "TRUE") %>% 
   select(Class)
 
 e <- dataset %>% 
-  filter(Decompiler == "Krakatau-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "Krakatau" & passTests == "TRUE") %>% 
   select(Class)
 
 f <- dataset %>% 
-  filter(Decompiler == "Fernflower-2.5.0.Final-report.csv" & passTests == "TRUE") %>% 
+  filter(Decompiler == "Fernflower-2.5.0.Final" & passTests == "TRUE") %>% 
   select(Class)
 
-decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower")
+g <- dataset %>% 
+  filter(Decompiler == "Dava-3.3.0" & passTests == "TRUE") %>% 
+  select(Class)
+
+decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class, g$Class)
+snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
 venn(decompilersToPlot, snames = snames, ilab=TRUE, zcolor = "style")
 ```
