@@ -38,11 +38,11 @@ public class Project {
 
     public void run(Decompiler dc, File outputDir) throws IOException, JSONException {
         classes = getClasses();
-        run(dc, classes, outputDir, true);
+        run(dc, classes, outputDir, false);
     }
 
 
-    public void run(Decompiler dc, List<String> classesToRun, File outputDir, boolean clean) throws IOException, JSONException {
+    public void run(Decompiler dc, List<String> classesToRun, File outputDir, boolean debug) throws IOException, JSONException {
         workingDir = new File(tmpDir, originalDir.getName());
         if (workingDir.exists()) {
             FileUtils.deleteDirectory(workingDir);
@@ -62,7 +62,7 @@ public class Project {
         compile(originalDir);
 
 
-        if(clean) {
+        if(!debug) {
             report = new File(outputDir, projectName + ":" + dc.getName() + ":report.csv");
             FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,isRecompilable,passTests\n", false);
         }
@@ -81,16 +81,16 @@ public class Project {
                 distance = compare(cl);
                 isReCompilable = compile(workingDir);
                 if (isReCompilable) {
-                    passTests = test(tests.get(cl));
+                    passTests = test(tests.get(cl), debug);
                 }
             }
 
             //report
-            if(clean)
+            if(!debug)
                 report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NA" : ("" + passTests));
 
             //clean up
-            if(clean)
+            if(!debug)
                 restore(cl);
         }
     }
@@ -124,16 +124,22 @@ public class Project {
         }
     }
 
-    public boolean test(String tests) {
+    public boolean test(String tests, boolean debug) {
         if (tests != null) {
             File pomFile = new File(workingDir, "pom.xml");
             InvocationRequest request = new DefaultInvocationRequest();
             request.setBatchMode(true);
             request.setPomFile(pomFile);
             request.setGoals(Collections.singletonList("test"));
+
+            Properties properties = new Properties();
             if (!tests.equalsIgnoreCase("*")) {
-                Properties properties = new Properties();
                 properties.setProperty("test", tests);
+            }
+            if(debug) {
+                properties.setProperty("surefire.skipAfterFailureCount", "1");
+            }
+            if(!properties.isEmpty()) {
                 request.setProperties(properties);
             }
 
@@ -185,7 +191,7 @@ public class Project {
     }
 
     public void report(String cl, boolean isDecompilable, int distance, boolean isRecompilable, String passTests) throws IOException {
-        FileUtils.write(report, cl + "," + isDecompilable + "," + distance + "," + isRecompilable + "," + passTests + "\n", true);
+        FileUtils.write(report, cl + "," + isDecompilable + "," + (distance < 0 ? "NA" : distance) + "," + isRecompilable + "," + passTests + "\n", true);
         System.out.println("Class " + cl + " dc: " + isDecompilable + ", dist: " + distance + ", rc: " + isRecompilable + ", tests: " + passTests);
     }
 
