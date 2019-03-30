@@ -25,8 +25,11 @@ dataset <- read.csv("data/dataset.csv")
 ```{r}
 summary(dataset)
 
+dataset <- dataset
+
 # summary of numeric variables
 dataset %>%
+  filter(!is.na(distanceToOriginal)) %>%
   dplyr::select(Decompiler, distanceToOriginal) %>%
   group_by(Decompiler) %>%
   summarise(
@@ -36,7 +39,7 @@ dataset %>%
     q75 = quantile(distanceToOriginal, 0.75),
     max = max(distanceToOriginal),
     mean = mean(distanceToOriginal),
-    sd = sd(distanceToOriginal)
+    sd = sd(distanceToOriginal), na.rm=TRUE
   )
 
 # summary of non-numeric variables
@@ -55,10 +58,11 @@ dataset %>%
 
 ```{r}
 # Distance to the original
+#  filter(Decompiler != "Dava-3.3.0-report.csv") %>% 
 dataset %>% 
-  filter(Decompiler != "Dava-3.3.0-report.csv") %>% 
-  ggplot(aes(Decompiler, distanceToOriginal)) +
+  ggplot(aes(Decompiler, distanceToOriginal+0.1)) +
   geom_boxplot() +
+  scale_y_log10() +
   coord_flip()
 
 ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
