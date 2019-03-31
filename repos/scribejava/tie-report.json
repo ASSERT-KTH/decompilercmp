@@ -1,0 +1,209 @@
+{
+  "methodList": [
+    {
+      "method": "org.scribe.services.RSASha1SignatureService",
+      "called-in": [
+        "RSASha1SignatureServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.utils.StreamUtils",
+      "called-in": [
+        "StreamUtilsTest",
+        "ResponseTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.OAuthConfig",
+      "called-in": [
+        "ServiceBuilderTest"
+      ]
+    },
+    {
+      "method": "org.scribe.utils.OAuthEncoder",
+      "called-in": [
+        "HMACSha1SignatureServiceTest",
+        "OAuthEncoderTest",
+        "ParameterListTest",
+        "BaseStringExtractorTest",
+        "RequestTest",
+        "TokenExtractor20Test",
+        "TokenExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.extractors.TokenExtractorImpl",
+      "called-in": [
+        "TokenExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.Request",
+      "called-in": [
+        "BaseStringExtractorTest",
+        "RequestTest",
+        "OAuthRequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.ParameterList",
+      "called-in": [
+        "ParameterListTest",
+        "BaseStringExtractorTest",
+        "RequestTest",
+        "OAuthRequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.exceptions.OAuthException",
+      "called-in": [
+        "HMACSha1SignatureServiceTest",
+        "BaseStringExtractorTest",
+        "TokenExtractor20Test",
+        "TokenExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.extractors.BaseStringExtractorImpl",
+      "called-in": [
+        "BaseStringExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.utils.Preconditions",
+      "called-in": [
+        "HMACSha1SignatureServiceTest",
+        "ParameterListTest",
+        "BaseStringExtractorTest",
+        "ResponseTest",
+        "ServiceBuilderTest",
+        "TokenExtractor20Test",
+        "TokenTest",
+        "TokenExtractorTest",
+        "PreconditionsTest",
+        "OAuthEncoderTest",
+        "StreamUtilsTest",
+        "JsonTokenExtractorTest",
+        "RequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.SignatureType",
+      "called-in": [
+        "ServiceBuilderTest"
+      ]
+    },
+    {
+      "method": "org.scribe.services.TimestampServiceImpl$Timer",
+      "called-in": [
+        "TimestampServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.Verb",
+      "called-in": [
+        "BaseStringExtractorTest",
+        "RequestTest",
+        "OAuthRequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.extractors.TokenExtractor20Impl",
+      "called-in": [
+        "TokenExtractor20Test"
+      ]
+    },
+    {
+      "method": "org.scribe.model.Parameter",
+      "called-in": [
+        "ParameterListTest",
+        "BaseStringExtractorTest",
+        "RequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.builder.ServiceBuilder",
+      "called-in": [
+        "ServiceBuilderTest"
+      ]
+    },
+    {
+      "method": "org.scribe.exceptions.OAuthSignatureException",
+      "called-in": [
+        "HMACSha1SignatureServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.services.Base64Encoder",
+      "called-in": [
+        "HMACSha1SignatureServiceTest",
+        "RSASha1SignatureServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.services.TimestampServiceImpl",
+      "called-in": [
+        "TimestampServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.services.HMACSha1SignatureService",
+      "called-in": [
+        "HMACSha1SignatureServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.exceptions.OAuthParametersMissingException",
+      "called-in": [
+        "BaseStringExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.services.CommonsEncoder",
+      "called-in": [
+        "HMACSha1SignatureServiceTest",
+        "RSASha1SignatureServiceTest"
+      ]
+    },
+    {
+      "method": "org.scribe.utils.MapUtils",
+      "called-in": [
+        "MapUtilsTest"
+      ]
+    },
+    {
+      "method": "org.scribe.extractors.JsonTokenExtractor",
+      "called-in": [
+        "JsonTokenExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.Response",
+      "called-in": [
+        "RequestTest",
+        "ResponseTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.Token",
+      "called-in": [
+        "JsonTokenExtractorTest",
+        "TokenExtractor20Test",
+        "TokenTest",
+        "TokenExtractorTest"
+      ]
+    },
+    {
+      "method": "org.scribe.model.OAuthRequest",
+      "called-in": [
+        "BaseStringExtractorTest",
+        "OAuthRequestTest"
+      ]
+    },
+    {
+      "method": "org.scribe.extractors.HeaderExtractorImpl",
+      "called-in": [
+      ]
+    }
+  ]
+}
