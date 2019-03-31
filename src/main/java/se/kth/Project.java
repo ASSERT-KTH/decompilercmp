@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 public class Project {
     static File mavenHome = new File("/usr/share/maven");
     static File tmpDir = new File("tmp");
+    static int testExecutionTimeOut = 20*60;//20 minutes in seconds
     File originalDir;
     File workingDir;
     String pathToSources;
@@ -34,6 +35,7 @@ public class Project {
         originalDir = new File(pathToProject);
         this.pathToSources = pathToSources;
         projectName = originalDir.getName();
+        System.setProperty("nolabel", "true");
     }
 
     public void run(Decompiler dc, File outputDir) throws IOException, JSONException {
@@ -86,12 +88,14 @@ public class Project {
             }
 
             //report
-            if(!debug)
+            if(!debug) {
                 report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NA" : ("" + passTests));
+            }
 
             //clean up
-            if(!debug)
+            if(!debug) {
                 restore(cl);
+            }
         }
     }
 
@@ -101,12 +105,6 @@ public class Project {
         request.setBatchMode(true);
         request.setPomFile(pomFile);
         request.setGoals(Collections.singletonList("compile"));
-		/*Properties properties = new Properties();
-		if (sourceType == MavenLauncher.SOURCE_TYPE.APP_SOURCE) {
-			properties.setProperty("includeScope", "runtime");
-		}
-		properties.setProperty("mdep.outputFile", getSpoonClasspathTmpFileName(sourceType));
-		request.setProperties(properties);*/
 
         request.getOutputHandler(s -> System.out.println(s));
         request.getErrorHandler(s -> System.out.println(s));
@@ -131,12 +129,13 @@ public class Project {
             request.setBatchMode(true);
             request.setPomFile(pomFile);
             request.setGoals(Collections.singletonList("test"));
+            request.setTimeoutInSeconds(testExecutionTimeOut);
 
             Properties properties = new Properties();
             if (!tests.equalsIgnoreCase("*")) {
                 properties.setProperty("test", tests);
             }
-            if(debug) {
+            if(!debug) {
                 properties.setProperty("surefire.skipAfterFailureCount", "1");
             }
             if(!properties.isEmpty()) {
@@ -229,8 +228,8 @@ public class Project {
             result = walk.map(x -> x.toString())
                     .filter(f -> f.endsWith(".java"))
                     .map(
-                            s -> s.replace(srcDir.getAbsolutePath() + "/", "")
-                                    .replace(".java", "")
+                        s -> s.replace(srcDir.getAbsolutePath() + "/", "")
+                              .replace(".java", "")
                     ).collect(Collectors.toList());
 
         } catch (IOException e) {
