@@ -1,0 +1,4 @@
+Class,isDecompilable,distanceToOriginal,isRecompilable,passTests
+com/jakewharton/disklrucache/Util,false,NA,false,false
+com/jakewharton/disklrucache/DiskLruCache,false,NA,false,false
+com/jakewharton/disklrucache/StrictLineReader,false,NA,false,false

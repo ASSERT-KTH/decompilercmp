@@ -1,0 +1,133 @@
+---
+title: "Statistical Tests"
+output: html_notebook
+---
+
+This notebook performs the statistical tests applied to the results obtained with the decompilers.
+
+# Load required packages
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+# source("http://bioconductor.org/biocLite.R")
+# biocLite("Rgraphviz")
+# biocLite("graph")
+library("scmamp")
+theme_set(theme_bw())
+```
+
+# Read the dataset
+
+```{r}
+dataset <- read.csv("data/dataset.csv")
+```
+
+# Density plots of Decompilers' quality metrics
+
+```{r}
+# Comparison based on Distance to Original
+dataset %>% 
+  dplyr::select(Decompiler, distanceToOriginal) %>% 
+  ggplot(aes(distanceToOriginal, color = Decompiler)) +
+  geom_density() +
+  xlab("Distance to Original") +
+  ggtitle("Decompilers' Distance to Original") +
+  scale_x_log10()
+
+# Comparison based on Recompilation Success Ratio
+dataset %>%
+  dplyr::select(Decompiler, isRecompilable) %>%
+  group_by(Decompiler) %>%
+  count(Testable = isRecompilable) %>%
+  mutate(true_ratio = n / sum(n)) %>% 
+  ggplot(aes(true_ratio, color = Decompiler)) +
+  geom_density() +
+  xlab("Recompilation Success Ratio") +
+  ggtitle("Decompilers' Recompilation Success Ratio") +
+  scale_x_log10()
+
+# Comparison based on Pass Tests Ratio
+dataset %>%
+  dplyr::select(Decompiler, passTests) %>%
+  group_by(Decompiler) %>%
+  count(Testable = passTests) %>%
+  mutate(true_ratio = n / sum(n)) %>% 
+  ggplot(aes(true_ratio, color = Decompiler)) +
+  geom_density() +
+  xlab("Pass Tests Ratio") +
+  ggtitle("Decompilers' Pass Tests Ratio") +
+  scale_x_log10()
+```
+
+# Pairwise differences (Nemenyi Post Hoc Test)
+
+In [Demšar (2006)](https://dl.acm.org/citation.cfm?id=1248548) the author proposes the use of the Nemenyi test that compares all the algorithms pairwise. It is the non parametric equivalent to the Tukey post hoc test for ANOVA (which is also available through the tukeyPost function), and is based on the absolute difference of the average rankings of the classifiers. For a significance level $\alpha$, the test determines the critical difference (CD); if the difference between the average ranking of two classifiers is grater than CD, then the null hypothesis that the classifiers have the same performance is rejected. The function nemenyiTest computes the critical difference and all the pairwise differences.
+
+The critical differece plot is a way to visually check the differences. This kind of plot can be created using the plotCD function, which has two parameters, the data. matrix and the significance level. In the plot, those decompilers that are not joined by a line can be regarded as different.
+
+```{r}
+# Nemenyi Post Hoc Test of Decompilers w.r.t Distance to Original between Types
+distanceData <- dataset %>%
+  dplyr::select(Project, Decompiler, distanceToOriginal) %>%
+  group_by(Project, Decompiler) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, distanceToOriginal) %>%
+  group_by(Decompiler) %>%
+  mutate(row_id = 1:n()) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, distanceToOriginal, row_id) %>%
+  spread(key = Decompiler, value = distanceToOriginal) %>%
+  select(-row_id)
+
+test <- nemenyiTest (distanceData, alpha = 0.05)
+pdf("figures/cdplot_distance.pdf",
+    height = 5,
+    width = 8)
+plotCD(distanceData, alpha = 0.05, cex = 1.25)
+dev.off()
+
+# Nemenyi Post Hoc Test of Decompilers w.r.t Recompilable Projects
+recompilableData <- dataset %>%
+  dplyr::select(Project, Decompiler, isRecompilable) %>%
+  group_by(Project, Decompiler) %>%
+  count(Recompilable = isRecompilable) %>%
+  mutate(true_ratio = n / sum(n)) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, true_ratio) %>%
+  group_by(Decompiler) %>%
+  mutate(row_id = 1:n()) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, true_ratio, row_id) %>%
+  spread(key = Decompiler, value = true_ratio) %>%
+  select(-row_id)
+
+test <- nemenyiTest (recompilableData, alpha = 0.05)
+pdf("figures/cdplot_recompilable.pdf",
+    height = 5,
+    width = 8)
+plotCD(recompilableData, alpha = 0.05, cex = 1.25)
+dev.off()
+
+# Nemenyi Post Hoc Test of Decompilers w.r.t Testable Projects
+testableData <- dataset %>%
+  dplyr::select(Project, Decompiler, passTests) %>%
+  group_by(Project, Decompiler) %>%
+  count(Testable = passTests) %>%
+  mutate(true_ratio = n / sum(n)) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, true_ratio) %>%
+  group_by(Decompiler) %>%
+  mutate(row_id = 1:n()) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, true_ratio, row_id) %>%
+  spread(key = Decompiler, value = true_ratio) %>%
+  select(-row_id)
+
+test <- nemenyiTest(testableData, alpha = 0.05)
+pdf("figures/cdplot_testable.pdf",
+    height = 5,
+    width = 8)
+plotCD(testableData, alpha = 0.05, cex = 1.25)
+dev.off() 
+```
+

@@ -1,0 +1,5 @@
+Class,isDecompilable,distanceToOriginal,isRecompilable,passTests
+com/squareup/mimecraft/Multipart,true,74,false,false
+com/squareup/mimecraft/Utils,true,11,true,true
+com/squareup/mimecraft/Part,true,264,true,NA
+com/squareup/mimecraft/FormEncoding,true,63,true,true
