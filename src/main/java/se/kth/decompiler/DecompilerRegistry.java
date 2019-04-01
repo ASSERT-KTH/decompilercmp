@@ -16,5 +16,7 @@ public class DecompilerRegistry {
 		decompilers.put("Dava-3.3.0", new Dava());
 		decompilers.put("JD-GUI-1.4.1", new JDGui());
 		decompilers.put("Jode-1.1.2-pre1", new Jode());
+		decompilers.put("JADX-0.9.0", new JADX());
+
 	}
 }
