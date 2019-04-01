@@ -22,7 +22,7 @@ public class Dava implements Decompiler {
             // Main.v().run(args);
 
             ProcessBuilder pb = new ProcessBuilder("java",
-                    "-jar", "lib/sootclasses-trunk-jar-with-dependencies.jar",
+                    "-jar", "lib/sootclasses-3.3.0-trunk-jar-with-dependencies.jar",
                     "-cp", "/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar" +
                     ":" + "/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar" +
                     ":" + inBase.getAbsolutePath(),
