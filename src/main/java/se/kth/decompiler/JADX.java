@@ -18,8 +18,9 @@ public class JADX implements Decompiler {
                     in.getAbsolutePath() // input file (.dex, .apk, .jar or .class)
             );
             pb.directory(new File("lib/jadx-0.9.0/bin"));
-            pb.start();
-            return true;
+            Process p = pb.start();
+            int r =  p.waitFor();
+            return r==0;
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
