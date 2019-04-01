@@ -9,12 +9,12 @@ public class JADXTest {
 
     JADX jadx;
 
-    @Before
+    //@Before
     public void setUp() throws Exception {
         jadx = new JADX();
     }
 
-    @Test
+    //@Test
     public void decompile() {
 
         File in = new File("src/test/resources/DiffImpl.class");
