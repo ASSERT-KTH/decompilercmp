@@ -51,6 +51,6 @@ decompilercmp.iml
 .Rhistory
 .Rapp.history
 .RData
-notebooks/data
-notebooks/figures
+!notebooks/data
+!notebooks/figures
 .Rproj.user

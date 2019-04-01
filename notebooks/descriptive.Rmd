@@ -164,7 +164,6 @@ ggsave(filename = "figures/testable_projects_ratios.pdf", device="pdf", height =
 
 ### Decompilers that produce recompilable types which do not pass the tests (false positives)
 
-
 ```{r}
 dataset %>%
   filter(isRecompilable == TRUE & passTests == FALSE) %>% 
@@ -210,7 +209,3 @@ tmp %>% ggplot(aes(Class, n)) +
 
 ggsave(filename = "figures/recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 ```
-
-
-
-
