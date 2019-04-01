@@ -66,7 +66,7 @@ dataset %>%
 ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 ```
 
-### Distribution of non-numeric variables
+### Distribution of recompilable and testable types per decompilers
 
 ```{r}
 # Distribution of Recompilable Types for each Decompiler
@@ -80,7 +80,7 @@ dataset %>%
   ggtitle("Distribution of Recompilable Types for each Decompiler") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggsave(filename = "figures/recompilable.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+ggsave(filename = "figures/recompilable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 
 # Distribution of tests results for each Decompiler
 dataset %>% 
@@ -93,5 +93,124 @@ dataset %>%
   ggtitle("Distribution of Tests Results for each Decompiler") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggsave(filename = "figures/testable.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 ```
+
+### Distribution of recompilable and testable types per projects
+
+```{r}
+# Distribution of Recompilable Types for each Project
+dataset %>%
+  dplyr::select(Project, Decompiler, isDecompilable) %>%
+  group_by(Project, Decompiler) %>%
+  count(Decompilable = isDecompilable) %>%
+  ggplot(aes(Decompiler, n)) +
+  geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
+  ylab("# Types") +
+  ggtitle("Distribution of Recompilation of Types for each Project") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(Decompilable ~ .)
+  
+ggsave(filename = "figures/recompilable_projects.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+
+# Distribution of Testable Types for each Project
+dataset %>%
+  dplyr::select(Project, Decompiler, passTests) %>%
+  group_by(Project, Decompiler) %>%
+  count(Testable = passTests) %>%
+  ggplot(aes(Decompiler, n)) +
+  geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
+  ylab("# Types") +
+  ggtitle("Distribution of Tests Results for each Project") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(Testable ~ .)
+  
+ggsave(filename = "figures/testable_projects.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+```
+
+### Distribution of recompilable and testable ratios per projects
+
+```{r}
+# Distribution of Recompilable Types for each Project
+dataset %>%
+  dplyr::select(Project, Decompiler, isDecompilable) %>%
+  group_by(Project, Decompiler) %>%
+  count(Decompilable = isDecompilable) %>%
+  mutate(true_ratio = n / sum(n)) %>%
+  ggplot(aes(Decompiler, true_ratio)) +
+  geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
+  ylab("Ratio") +
+  ggtitle("Distribution of Recompilation Frequencies of each Project") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(Decompilable ~ .)
+  
+ggsave(filename = "figures/recompilable_projects_ratios.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+
+# Distribution of Testable Types for each Project
+dataset %>%
+  dplyr::select(Project, Decompiler, passTests) %>%
+  group_by(Project, Decompiler) %>%
+  count(Testable = passTests) %>%
+  mutate(true_ratio = n / sum(n)) %>%
+  ggplot(aes(Decompiler, true_ratio)) +
+  geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
+  ylab("Ratio") +
+  ggtitle("Distribution of Tests Results Frequencies for each Project") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(Testable ~ .)
+  
+ggsave(filename = "figures/testable_projects_ratios.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+```
+
+### Decompilers that produce recompilable types which do not pass the tests (false positives)
+
+
+```{r}
+dataset %>%
+  filter(isRecompilable == TRUE & passTests == FALSE) %>% 
+  count(Decompiler, Project) %>% 
+  ggplot(aes(x = reorder(Decompiler, -n), y = n, fill = Project)) +
+  geom_col() +
+  xlab("Decompiler") +
+  ylab("# Types") +
+  ggtitle("Projects Producing Recompilable Types Which do not Pass the Tests") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+
+ggsave(filename = "figures/projects_recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+```
+
+Plot the most problematic types
+
+```{r}
+# Arrange the recompilable types for which the tests fail 
+tmp <- dataset %>%
+  filter(isRecompilable == TRUE & passTests == FALSE) %>%
+  group_by(Class) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  filter(n > 1) 
+
+# Sort types by number of decompilers that fail
+tmp <- tmp[order(tmp$n),]
+tmp$Class <- factor(tmp$Class, levels = tmp$Class) 
+  
+tmp %>% ggplot(aes(Class, n)) +
+  geom_point(stat = 'identity', fill = "black", size = 2)  +
+  geom_segment(aes(
+    y = 0,
+    x = Class,
+    yend = n,
+    xend = Class
+  ),
+  color = "black") +
+  ylab("# Decompilers that Fail Tests") +
+  xlab("Types") +
+  ggtitle("Recompilable Types for Which the Tests Fail") +
+  coord_flip()
+
+ggsave(filename = "figures/recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+```
+
+
+
+

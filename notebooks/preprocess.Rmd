@@ -13,7 +13,7 @@ library(tidyverse)
 
 ### Preprocess the data to get the full tidy dataset with all decompilers' results
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # go to parent directory
 setwd("..")
 reportsDir <- paste(getwd(), "/report/", sep = "")
