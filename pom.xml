@@ -26,6 +26,15 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>jadx</groupId>
+            <artifactId>jadx-cli</artifactId>
+            <version>0.9.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/jadx-0.9.0/lib/jadx-cli-0.9.0.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>cli.jd</groupId>
             <artifactId>jd-gui</artifactId>
