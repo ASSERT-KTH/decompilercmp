@@ -101,9 +101,9 @@ ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, 
 ```{r}
 # Distribution of Recompilable Types for each Project
 dataset %>%
-  dplyr::select(Project, Decompiler, isDecompilable) %>%
+  dplyr::select(Project, Decompiler, isRecompilable) %>%
   group_by(Project, Decompiler) %>%
-  count(Decompilable = isDecompilable) %>%
+  count(Decompilable = isRecompilable) %>%
   ggplot(aes(Decompiler, n)) +
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
   ylab("# Types") +
@@ -133,9 +133,9 @@ ggsave(filename = "figures/testable_projects.pdf", device="pdf", height = 5, wid
 ```{r}
 # Distribution of Recompilable Types for each Project
 dataset %>%
-  dplyr::select(Project, Decompiler, isDecompilable) %>%
+  dplyr::select(Project, Decompiler, isRecompilable) %>%
   group_by(Project, Decompiler) %>%
-  count(Decompilable = isDecompilable) %>%
+  count(Decompilable = isRecompilable) %>%
   mutate(true_ratio = n / sum(n)) %>%
   ggplot(aes(Decompiler, true_ratio)) +
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
@@ -176,6 +176,35 @@ dataset %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 
 ggsave(filename = "figures/projects_recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+
+# Plot Categories of Outputs for Each Decompiler
+dataset %>%
+  dplyr::select(Decompiler, Project, isRecompilable, passTests) %>%
+  filter(is.na(passTests) == FALSE) %>%
+  mutate(Category = ifelse(
+    isRecompilable == FALSE,
+    "NOT R",
+    ifelse(
+      isRecompilable == TRUE & passTests == FALSE,
+      "R AND NOT P",
+      ifelse(isRecompilable == TRUE & passTests == TRUE,
+             "R AND P",
+             "NA")
+    )
+  )) %>%
+  group_by(Decompiler, Project) %>%
+  count(Categories = Category) %>%
+  ggplot(aes(x = reorder(Decompiler, -n), y = n)) +
+  geom_bar(aes(fill = Project), position = "stack", stat = "identity") +
+  stat_summary(fun.y = sum, aes(label = ..y.., group = Categories), geom = "text", vjust = -.2) +
+  ylim(0, 1000) +
+  xlab("Decompiler") +
+  ylab("# Types") +
+  facet_grid(Categories ~ .) +
+  ggtitle("Categories of Ouputs For Each Decompiler") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+
+ggsave(filename = "figures/recompilation_categories_results.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 ```
 
 Plot the most problematic types

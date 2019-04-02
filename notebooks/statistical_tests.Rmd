@@ -130,4 +130,3 @@ pdf("figures/cdplot_testable.pdf",
 plotCD(testableData, alpha = 0.05, cex = 1.25)
 dev.off() 
 ```
-
