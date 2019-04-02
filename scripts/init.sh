@@ -20,3 +20,4 @@ do
 	java -cp $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar fr.inria.tie.Report -i log -o tie-report.json -g Class
 	cd ..
 done
+

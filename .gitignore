@@ -54,3 +54,5 @@ decompilercmp.iml
 !notebooks/data
 !notebooks/figures
 .Rproj.user
+
+report/

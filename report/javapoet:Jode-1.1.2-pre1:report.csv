@@ -1,3 +1,0 @@
-Class,isDecompilable,distanceToOriginal,isRecompilable,passTests
-com/squareup/javawriter/JavaWriter,true,2329,true,false
-com/squareup/javawriter/StringLiteral,true,26,true,true
