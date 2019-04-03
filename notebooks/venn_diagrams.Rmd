@@ -149,3 +149,59 @@ pdf("figures/venn_diagram_failures.pdf")
   )
 dev.off() 
 ```
+
+### Venn Diagram of types which are recompilable but do not pass tests and at least one decompiler is able to make it recompilable and pass tests (i.e. how good a decompiler is decompiling types for which others fail?)
+
+```{r}
+RnotT <- dataset %>%
+  filter(isRecompilable == TRUE & passTests == FALSE) %>%
+  dplyr::select(Decompiler, Project, Class, passTests)
+
+RT <- dataset %>%
+  filter(isRecompilable == TRUE & passTests == TRUE) %>%
+  dplyr::select(Decompiler, Project, Class, passTests)
+
+join_dataset <- dplyr::inner_join(RnotT, RT, by = c("Class", "Project"))
+
+# View the result of the join for better understandability 
+View(join_dataset)
+
+a <- join_dataset %>%
+  filter(Decompiler.y == "CFR-0.141" & passTests.y == "TRUE") %>%
+  select(Class)
+
+b <- join_dataset %>%
+  filter(Decompiler.y == "Procyon-0.5.34" & passTests.y == "TRUE") %>%
+  select(Class)
+
+c <- join_dataset %>%
+  filter(Decompiler.y == "JD-GUI-1.4.1" & passTests.y == "TRUE") %>%
+  select(Class)
+
+d <- join_dataset %>%
+  filter(Decompiler.y == "Jode-1.1.2-pre1" & passTests.y == "TRUE") %>%
+  select(Class)
+
+e <- join_dataset %>%
+  filter(Decompiler.y == "Krakatau" & passTests.y == "TRUE") %>%
+  select(Class)
+
+f <- join_dataset %>%
+  filter(Decompiler.y == "Fernflower-2.5.0.Final" & passTests.y == "TRUE") %>%
+  select(Class)
+
+g <- join_dataset %>%
+  filter(Decompiler.y == "Dava-3.3.0" & passTests.y == "TRUE") %>%
+  select(Class)
+
+decompilersToPlot <- list(a$Class, b$Class, c$Class, d$Class, e$Class, f$Class, g$Class)
+snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
+pdf("figures/venn_diagram_classes.pdf")
+  venn(
+    decompilersToPlot,
+    snames = snames,
+    ilab = TRUE,
+    zcolor = "style"
+  )
+dev.off() 
+```
