@@ -623,7 +623,7 @@
 
 
   <build>
-   <defaultGoal>clean verify apache-rat:check clirr:check checkstyle:check spotbugs:check javadoc:javadoc</defaultGoal>
+   <!--<defaultGoal>clean verify apache-rat:check clirr:check checkstyle:check spotbugs:check javadoc:javadoc</defaultGoal>-->
    <pluginManagement>
       <plugins>
         <plugin>
@@ -631,7 +631,7 @@
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
             <excludes>
-              <exclude>log/**</exclude>
+              <exclude>**</exclude>
               <exclude>tie-report.json</exclude>
               <exclude>site-content/**</exclude>
               <exclude>src/site/resources/.htaccess</exclude>

@@ -10,5 +10,6 @@
 	{"repo":"mimecraft", "url":"https://github.com/square/mimecraft.git", "commit":"e7b3f9a764fc34cd473e6e2072cb5a995bec0bb2", "packages":"com.squareup.mimecraft"},
 	{"repo":"javapoet", "url":"https://github.com/square/javapoet.git", "commit":"d39761f9ec25ca5bf3b7bf15d34fa2b831fed9c1", "packages":""},
 	{"repo":"scribejava", "url":"https://github.com/scribejava/scribejava.git", "commit":"e47e494ce39f9b180352fc9b5fd73c8b3ccce7f8", "packages":""},
-	{"repo":"junit4", "url":"https://github.com/junit-team/junit4.git", "commit":"077f5c502a2494c3625941724ddcd5412a99ccc8", "packages":""}
+	{"repo":"junit4", "url":"https://github.com/junit-team/junit4.git", "commit":"077f5c502a2494c3625941724ddcd5412a99ccc8", "packages":""},
+	{"repo":"spark", "url":"https://github.com/perwendel/spark.git", "commit":"a19594a0e9d824c61996897cf8d1efcd9da43313", "packages":""}
 ]
