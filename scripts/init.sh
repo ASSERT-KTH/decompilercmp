@@ -1,9 +1,11 @@
 #!/bin/bash
 
 CONFIG=$(<$1)
-YAJTA_DIR=$2
-YAJTA="$YAJTA_DIR/script/tie-maven.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
+#YAJTA_DIR=$2
+#YAJTA="$YAJTA_DIR/script/tie-maven.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
 
+mkdir repos
+cd repos
 
 for o in $(echo $CONFIG | jq -c '.[]')
 do
@@ -15,9 +17,10 @@ do
 	git clone $URL
 	cd $REPO
 	git reset --hard $COMMIT
-	mvn install
-	eval $YAJTA
-	java -cp $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar fr.inria.tie.Report -i log -o tie-report.json -g Class
+	#mvn install
+	#eval $YAJTA
+	#java -cp $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar fr.inria.tie.Report -i log -o tie-report.json -g Class
 	cd ..
 done
 
+cd ..
