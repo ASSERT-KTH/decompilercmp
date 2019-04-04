@@ -20,6 +20,11 @@ public class Project {
     //static File mavenHome = new File("/opt/apache-maven-3.6.0");
     static File tmpDir = new File("tmp");
     static int testExecutionTimeOut = 20*60;//20 minutes in seconds
+
+    //static String compileGoal = "org.apache.maven.plugins:maven-compiler-plugin:3.7.0:compile";
+    static String compileGoal = "compile";
+
+
     File originalDir;
     File workingDir;
     String pathToSources;
@@ -27,15 +32,20 @@ public class Project {
     Map<String, String> tests;
     File report;
     String projectName;
+    String compilerId;
 
     public Project(String pathToProject) {
         this(pathToProject, "src/main/java");
     }
 
     public Project(String pathToProject, String pathToSources) {
+        this(pathToProject,pathToSources,"javac");
+    }
+    public Project(String pathToProject, String pathToSources, String compilerId) {
         originalDir = new File(pathToProject);
         this.pathToSources = pathToSources;
         projectName = originalDir.getName();
+        this.compilerId = compilerId;
         System.setProperty("nolabel", "true");
     }
 
@@ -62,11 +72,11 @@ public class Project {
         }
 
         //mvn compile original
-        compile(originalDir);
+        compile(originalDir, true);
 
 
         if(!debug) {
-            report = new File(outputDir, projectName + ":" + dc.getName() + ":report.csv");
+            report = new File(outputDir, projectName + ":" + dc.getName() + ":" + compilerId + ":report.csv");
             FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,nbNodesOriginal,isRecompilable,bytecodeDistance,passTests\n", false);
         }
 
@@ -85,7 +95,7 @@ public class Project {
             if (isDecompilable) {
                 distance = compare(cl);
                 nbNodes = getNbNode(cl);
-                isReCompilable = compile(workingDir);
+                isReCompilable = compile(workingDir, false);
                 if (isReCompilable) {
                     byteCodeDistance = compareByteCode(cl);
 
@@ -105,12 +115,24 @@ public class Project {
         }
     }
 
-    public boolean compile(File dir) {
+    public boolean compile(File dir, boolean clean) {
         File pomFile = new File(dir, "pom.xml");
         InvocationRequest request = new DefaultInvocationRequest();
         request.setBatchMode(true);
         request.setPomFile(pomFile);
-        request.setGoals(Collections.singletonList("compile"));
+        //request.setDebug(true);
+        if(!clean) {
+            request.setGoals(Collections.singletonList(compileGoal));
+        } else {
+            List<String> goals = new LinkedList<>();
+            goals.add("clean");
+            goals.add(compileGoal);
+            request.setGoals(goals);
+        }
+
+        Properties properties = new Properties();
+        properties.setProperty("maven.compiler.compilerId", compilerId);
+        request.setProperties(properties);
 
         request.getOutputHandler(s -> System.out.println(s));
         request.getErrorHandler(s -> System.out.println(s));

@@ -23,9 +23,12 @@ public class DecompilerComparator {
     @Parameter(names = {"--decompiler-name", "-d"}, description = "Name of the decompiler to test. See se.kth.Decompiler for more details. Default CFR-0.141")
     private String decompilerName = "CFR-0.141";
     @Parameter(names = {"--debug-class", "-c"}, description = "Optional. Run a single class")
-    String classToRun;
+    private String classToRun;
     @Parameter(names = {"--output-dir", "-o"}, description = "Path to output directory. Default: report")
-    String outputDirPath = "report";
+    private  String outputDirPath = "report";
+
+    @Parameter(names = {"--java-compiler", "-j"}, description = "Path to output directory. Default: default")
+    private  String compiler = "report";
 
 
     public static void main( String[] args ) throws IOException, JSONException {
@@ -52,7 +55,7 @@ public class DecompilerComparator {
             }
             if(!ouputDir.exists()) ouputDir.mkdirs();
 
-            Project project = new Project(projectDir.getAbsolutePath());
+            Project project = new Project(projectDir.getAbsolutePath(),"src/main/java", decompilerComparator.compiler);
             Decompiler decompiler = DecompilerRegistry.decompilers.get(decompilerComparator.decompilerName);
             if(decompiler == null) {
                 System.err.println("Error: " + decompilerComparator.decompilerName + " not in the decompiler list.");

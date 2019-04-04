@@ -66,9 +66,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
-                <configuration>
-                    <compilerId>eclipse</compilerId>
-                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
