@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 public class Project {
     static File mavenHome = new File("/usr/share/maven");
+    //static File mavenHome = new File("/opt/apache-maven-3.6.0");
     static File tmpDir = new File("tmp");
     static int testExecutionTimeOut = 20*60;//20 minutes in seconds
     File originalDir;
@@ -66,13 +67,15 @@ public class Project {
 
         if(!debug) {
             report = new File(outputDir, projectName + ":" + dc.getName() + ":report.csv");
-            FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,isRecompilable,passTests\n", false);
+            FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,nbNodesOriginal,isRecompilable,bytecodeDistance,passTests\n", false);
         }
 
         for (String cl : classesToRun) {
             boolean isDecompilable = false;
             int distance = Integer.MIN_VALUE;
+            int nbNodes = Integer.MIN_VALUE;
             boolean isReCompilable = false;
+            int byteCodeDistance = Integer.MIN_VALUE;
             boolean passTests = false;
 
             //init
@@ -81,15 +84,18 @@ public class Project {
             isDecompilable = decompile(dc, cl);
             if (isDecompilable) {
                 distance = compare(cl);
+                nbNodes = getNbNode(cl);
                 isReCompilable = compile(workingDir);
                 if (isReCompilable) {
+                    byteCodeDistance = compareByteCode(cl);
+
                     passTests = test(tests.get(cl), debug);
                 }
             }
 
             //report
             if(!debug) {
-                report(cl, isDecompilable, distance, isReCompilable, (tests.get(cl) == null) ? "NA" : ("" + passTests));
+                report(cl, isDecompilable, distance, nbNodes, isReCompilable, byteCodeDistance, (tests.get(cl) == null) ? "NA" : ("" + passTests));
             }
 
             //clean up
@@ -189,9 +195,33 @@ public class Project {
         return new GumtreeASTDiff().compare(src, nsrc);
     }
 
-    public void report(String cl, boolean isDecompilable, int distance, boolean isRecompilable, String passTests) throws IOException {
-        FileUtils.write(report, cl + "," + isDecompilable + "," + (distance < 0 ? "NA" : distance) + "," + isRecompilable + "," + passTests + "\n", true);
-        System.out.println("Class " + cl + " dc: " + isDecompilable + ", dist: " + distance + ", rc: " + isRecompilable + ", tests: " + passTests);
+    public int compareByteCode(String cl) {
+        File originalByteCode = new File(originalDir, "target/classes/" + cl + ".class");
+        File nByteCode = new File(workingDir, "target/classes/" + cl + ".class");
+        return ByteCodeDiff.compare(originalByteCode, nByteCode);
+    }
+
+    public int getNbNode(String cl) {
+        File src = new File(originalDir, "src/main/java/" + cl + ".java");
+        return new GumtreeASTDiff().getNbNode(src);
+    }
+
+    public void report(String cl, boolean isDecompilable, int distance, int nbNodes, boolean isRecompilable, int byteCodeDistance, String passTests) throws IOException {
+        FileUtils.write(report, cl + "," +
+                isDecompilable + "," +
+                (distance < 0 ? "NA" : distance) + "," +
+                (nbNodes < 0 ? "NA" : nbNodes) + "," +
+                isRecompilable + "," +
+                (byteCodeDistance < 0 ? "NA" : byteCodeDistance) + "," +
+                passTests + "\n",
+                true);
+
+        System.out.println("Class " + cl + " dc: " + isDecompilable +
+                ", dist: " + distance +
+                ", nbNodes: " + nbNodes +
+                ", rc: " + isRecompilable +
+                ", byteCodeDistance: " + byteCodeDistance +
+                ", tests: " + passTests);
     }
 
     public Map<String, String> loadTests() throws JSONException, IOException {
