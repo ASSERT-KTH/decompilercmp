@@ -4,7 +4,7 @@ CONFIG=$(<$1)
 #YAJTA_DIR=$2
 #YAJTA="$YAJTA_DIR/script/tie-maven.sh $YAJTA_DIR/target/yajta-2.0.0-jar-with-dependencies.jar"
 
-mkdir repos
+
 cd repos
 
 for o in $(echo $CONFIG | jq -c '.[]')
