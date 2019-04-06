@@ -24,16 +24,18 @@ fileList = list.files(
   )
 
 # final dataset
-dataset <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(dataset) <- c("Project", "Decompiler", "Class", "isDecompilable", "distanceToOriginal", "isRecompilable", "passTests")
+dataset <- data.frame(matrix(ncol = 10, nrow = 0))
+colnames(dataset) <- c("Project", "Decompiler", "Compiler", "Class", "isDecompilable", "distanceToOriginal", "nbNodesOriginal", "isRecompilable", "bytecodeDistance", "passTests")
 
 # read and add all the result files into a dataset 
 for (i in 1:length(fileList)) {
   projectName <- strsplit(fileList[i], ":")[[1]][1]
   decompilerName <- strsplit(fileList[i], ":")[[1]][2]
+  compilerName <- strsplit(fileList[i], ":")[[1]][3]
   individualReport <- read_csv(paste(reportsDir, fileList[i], sep = ""), col_names = T)
   individualReport$Project <- projectName
   individualReport$Decompiler <- decompilerName
+  individualReport$Compiler <- compilerName
   dataset <- dplyr::bind_rows(dataset, individualReport)
 }
 ```
