@@ -14,7 +14,7 @@ public class Krakatau implements Decompiler {
 
 		String mvnHome = null;
 		try {
-			String[] cmd = new String[]{"python2.7", "lib//Krakatau/decompile.py", "-out", outDir.getAbsolutePath(), "-path", path, cl};
+			String[] cmd = new String[]{"python2.7", "lib/Krakatau/decompile.py", "-out", outDir.getAbsolutePath(), "-path", path, cl};
 
 			Process p = Runtime.getRuntime().exec(cmd);
 
