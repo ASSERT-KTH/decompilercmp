@@ -10,10 +10,10 @@ unzip jadx-0.9.0.zip -d jadx-0.9.0
 rm jadx-0.9.0.zip
 
 echo "dl Krakatau ..."
-wget https://github.com/Storyyeller/Krakatau/archive/master.zip
-mkdir Krakatau
-unzip master.zip -d Krakatau
-rm master.zip
+wget https://github.com/Storyyeller/Krakatau/archive/258ae9a931e0c403a79a737e7f41d0fb0cbac051.zip
+unzip 258ae9a931e0c403a79a737e7f41d0fb0cbac051.zip -d .
+mv Krakatau-258ae9a931e0c403a79a737e7f41d0fb0cbac051 Krakatau
+rm 258ae9a931e0c403a79a737e7f41d0fb0cbac051.zip
 
 echo "dl jode-1.1.2-pre1 ..."
 wget https://downloads.sourceforge.net/project/jode/jode/1.1.2-pre1/jode-1.1.2-pre1.jar?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fjode%2Ffiles%2Flatest%2Fdownload&ts=1554126208
