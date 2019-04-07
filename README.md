@@ -29,3 +29,9 @@ Class,isDecompilable,distanceToOriginal,isRecompilable,passTests
 
 
 AST comparator is shamelessly copied from [gumtree-spoon-ast-diff](https://github.com/SpoonLabs/gumtree-spoon-ast-diff).
+
+Note that if the targeted project supports it, eclipse compiler can be used instead of javac with
+
+```bash
+java -cp decompilercmp.jar se.kth.DecompilerComparator -p /path/to/test/project -d DecompilerName -j eclipse
+```
