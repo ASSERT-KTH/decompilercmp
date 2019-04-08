@@ -12,6 +12,14 @@ library(tidyverse)
 library(VennDiagram)
 library(venn)
 theme_set(theme_bw())
+
+# Set up a different colour palette
+# library(RColorBrewer)
+# ggplot <- function(...)
+#     ggplot2::ggplot(...) + 
+#   scale_color_discrete(palette = "Spectral") +
+#   scale_color_brewer(palette = "Spectral") + 
+#   scale_fill_brewer(palette = "Spectral")
 ```
 
 # Read the dataset
@@ -27,17 +35,17 @@ summary(dataset)
 
 # summary of numeric variables
 dataset %>%
-  filter(!is.na(distanceToOriginal)) %>%
-  dplyr::select(Decompiler, distanceToOriginal) %>%
+  filter(!is.na(distanceToOriginal) & !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>%
+  dplyr::select(Decompiler, distanceToOriginal, nbNodesOriginal) %>%
   group_by(Decompiler) %>%
   summarise(
-    min = min(distanceToOriginal),
-    q25 = quantile(distanceToOriginal, 0.25),
-    median = median(distanceToOriginal),
-    q75 = quantile(distanceToOriginal, 0.75),
-    max = max(distanceToOriginal),
-    mean = mean(distanceToOriginal),
-    sd = sd(distanceToOriginal)
+    min = min(distanceToOriginal/nbNodesOriginal),
+    q25 = quantile(distanceToOriginal/nbNodesOriginal, 0.25),
+    median = median(distanceToOriginal/nbNodesOriginal),
+    q75 = quantile(distanceToOriginal/nbNodesOriginal, 0.75),
+    max = max(distanceToOriginal/nbNodesOriginal),
+    mean = mean(distanceToOriginal/nbNodesOriginal),
+    sd = sd(distanceToOriginal/nbNodesOriginal)
   )
 
 # summary of non-numeric variables
@@ -57,10 +65,10 @@ dataset %>%
 ```{r}
 # Distance to the original
 dataset %>% 
-  filter(!is.na(distanceToOriginal)) %>% 
-  ggplot(aes(Decompiler, distanceToOriginal+0.1)) +
+  filter(!is.na(distanceToOriginal) & !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>% 
+  ggplot(aes(Decompiler, distanceToOriginal/nbNodesOriginal)) +
   geom_boxplot() +
-  scale_y_log10() +
+  scale_y_continuous(limits = c(0, 1)) +
   coord_flip()
 
 ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
@@ -85,12 +93,29 @@ ggsave(filename = "figures/recompilable_decompilers.pdf", device="pdf", height =
 # Distribution of tests results for each Decompiler
 dataset %>% 
   dplyr::select(Decompiler, passTests) %>% 
+  filter(!is.na(passTests)) %>% 
   group_by(Decompiler) %>% 
   count(PassTests = passTests) %>% 
   ggplot(aes(Decompiler, n)) +
   geom_bar(aes(fill = PassTests), position = "dodge", stat="identity") +
   ylab("Tests") +
   ggtitle("Distribution of Tests Results for each Decompiler") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+
+
+# Distribution of tests results for each Compiler
+dataset %>%
+  filter(Project != "commons-lang" & passTests == TRUE) %>% 
+  dplyr::select(Decompiler, Compiler, passTests) %>%
+  filter(!is.na(passTests)) %>%
+  group_by(Decompiler, Compiler) %>%
+  count(PassTests = passTests) %>%
+  ggplot(aes(Decompiler, n, fill = Compiler)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("Tests") +
+  ggtitle("Distribution of Tests Results for each Decompiler") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
@@ -116,6 +141,7 @@ ggsave(filename = "figures/recompilable_projects.pdf", device="pdf", height = 5,
 # Distribution of Testable Types for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, passTests) %>%
+  filter(!is.na(passTests)) %>% 
   group_by(Project, Decompiler) %>%
   count(Testable = passTests) %>%
   ggplot(aes(Decompiler, n)) +
@@ -149,6 +175,7 @@ ggsave(filename = "figures/recompilable_projects_ratios.pdf", device="pdf", heig
 # Distribution of Testable Types for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, passTests) %>%
+  filter(!is.na(passTests)) %>% 
   group_by(Project, Decompiler) %>%
   count(Testable = passTests) %>%
   mutate(true_ratio = n / sum(n)) %>%
@@ -197,7 +224,7 @@ dataset %>%
   ggplot(aes(x = reorder(Decompiler, -n), y = n)) +
   geom_bar(aes(fill = Project), position = "stack", stat = "identity") +
   stat_summary(fun.y = sum, aes(label = ..y.., group = Categories), geom = "text", vjust = -.2) +
-  ylim(0, 1000) +
+  ylim(0, 2500) +
   xlab("Decompiler") +
   ylab("# Types") +
   facet_grid(Categories ~ .) +
@@ -211,12 +238,36 @@ Plot the most problematic types
 
 ```{r}
 # Arrange the recompilable types for which the tests fail 
-tmp <- dataset %>%
+tmp1 <- dataset %>%
+  filter(Compiler == "javac") %>% 
   filter(isRecompilable == TRUE & passTests == FALSE) %>%
   group_by(Class) %>%
   count() %>%
   arrange(desc(n)) %>%
-  filter(n > 1) 
+  filter(n > 1) %>% 
+  dplyr::rename(TF = n)
+
+tmp2 <- dataset %>%
+  filter(Compiler == "javac") %>% 
+  filter(isRecompilable == FALSE & passTests == FALSE) %>%
+  group_by(Class) %>%
+  count() %>%
+  arrange(desc(n)) %>% 
+  dplyr::rename(FF = n)
+  
+tmp3 <- dataset %>%
+  filter(Compiler == "javac") %>% 
+  filter(isRecompilable == TRUE & passTests == TRUE) %>%
+  group_by(Class) %>%
+  count() %>%
+  arrange(desc(n)) %>% 
+  dplyr::rename(TT = n)
+
+problematicClasses <- dplyr::left_join(dplyr::left_join(tmp1, tmp2, by="Class"), tmp3, by = "Class") %>% 
+  replace_na(list(TF = 0, FF = 0, TT = 0)) %>% 
+  mutate(Metaproblem = ifelse((TF + FF) == 8, TRUE, FALSE))
+
+table(problematicClasses$Metaproblem)
 
 # Sort types by number of decompilers that fail
 tmp <- tmp[order(tmp$n),]
