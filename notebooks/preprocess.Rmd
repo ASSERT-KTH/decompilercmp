@@ -38,6 +38,40 @@ for (i in 1:length(fileList)) {
   individualReport$Compiler <- compilerName
   dataset <- dplyr::bind_rows(dataset, individualReport)
 }
+
+# simplify the names of decompilers
+dataset <- dataset %>%
+  mutate(Decompiler = ifelse(
+    Decompiler == "CFR-0.141",
+    "CFR",
+    ifelse(
+      Decompiler == "Dava-3.3.0",
+      "Dava",
+      ifelse(
+        Decompiler == "Fernflower-2.5.0.Final",
+        "Fernflower",
+        ifelse(
+          Decompiler == "JADX-0.9.0",
+          "JADX",
+          ifelse(
+            Decompiler == "JD-GUI-1.4.1",
+            "JD",
+            ifelse(
+              Decompiler == "Jode-1.1.2-pre1",
+              "Jode",
+              ifelse(
+                Decompiler == "Procyon-0.5.34",
+                "Procyon",
+                ifelse(Decompiler == "Krakatau",
+                       "Krakatau",
+                       NA)
+              )
+            )
+          )
+        )
+      )
+    )
+  ))
 ```
 
 ### Save the dataset
