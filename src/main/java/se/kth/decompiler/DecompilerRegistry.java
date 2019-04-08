@@ -10,7 +10,8 @@ public class DecompilerRegistry {
 	static {
 		decompilers = new HashMap<>();
 		decompilers.put("CFR-0.141", new CFR());
-		decompilers.put("Fernflower-2.5.0.Final", new Fernflower());
+		//decompilers.put("Fernflower-2.5.0.Final", new Fernflower());
+		decompilers.put("Fernflower", new Fernflower());
 		decompilers.put("Krakatau", new Krakatau());
 		decompilers.put("Procyon-0.5.34", new Procyon());
 		decompilers.put("Dava-3.3.0", new Dava());
