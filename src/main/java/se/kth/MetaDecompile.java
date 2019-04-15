@@ -80,10 +80,14 @@ public class MetaDecompile extends Project {
 			int nbAttempt = 0;
 
 			//init
-			removeClass(cl);
 
 			for(Decompiler decompiler: decompilerOrder) {
 				System.out.println("[MetaDecompiler] try with " + decompiler.getName());
+
+				try {
+					removeClass(cl);
+				} catch (Exception e) {}
+
 				nbAttempt++;
 				int r = tryDecompile(cl, decompiler, withTest, debug);
 				if(withTest && r == 2) {

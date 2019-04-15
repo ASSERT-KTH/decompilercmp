@@ -193,7 +193,6 @@ public class Project {
     public void removeClass(String cl) {
         File src = new File(workingDir, "src/main/java/" + cl + ".java");
         src.delete();
-
     }
 
     public void restore(String cl) throws IOException {
