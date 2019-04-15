@@ -262,7 +262,9 @@ public class Project {
                     if (j != 0) testList += ",";
                     testList += clTests.getString(j);
                 }
-                tests.put(clName, testList);
+                if(testList.length() > 0) {
+                    tests.put(clName, testList);
+                }
             }
             return tests;
         } catch (Exception e) {

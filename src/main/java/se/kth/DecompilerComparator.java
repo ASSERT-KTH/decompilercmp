@@ -28,7 +28,10 @@ public class DecompilerComparator {
     private  String outputDirPath = "report";
 
     @Parameter(names = {"--java-compiler", "-j"}, description = "Path to output directory. Default: default")
-    private  String compiler = "report";
+    private  String compiler = "javac";
+
+    @Parameter(names = {"--with-tests", "-t"}, description = "Meta decompile with tests")
+    private boolean withTests = false;
 
 
     public static void main( String[] args ) throws IOException, JSONException {
@@ -55,20 +58,29 @@ public class DecompilerComparator {
             }
             if(!ouputDir.exists()) ouputDir.mkdirs();
 
-            Project project = new Project(projectDir.getAbsolutePath(),"src/main/java", decompilerComparator.compiler);
-            Decompiler decompiler = DecompilerRegistry.decompilers.get(decompilerComparator.decompilerName);
-            if(decompiler == null) {
-                System.err.println("Error: " + decompilerComparator.decompilerName + " not in the decompiler list.");
-	            System.err.println("Here are the available decompilers:");
-	            for(String dc :DecompilerRegistry.decompilers.keySet()) {
-		            System.out.println("\t\t" + dc);
-	            }
-                return;
-            }
-            if(decompilerComparator.classToRun != null) {
-                project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun),ouputDir, true);
+            if(!decompilerComparator.decompilerName.equalsIgnoreCase("Meta")) {
+                Project project = new Project(projectDir.getAbsolutePath(), "src/main/java", decompilerComparator.compiler);
+                Decompiler decompiler = DecompilerRegistry.decompilers.get(decompilerComparator.decompilerName);
+                if (decompiler == null) {
+                    System.err.println("Error: " + decompilerComparator.decompilerName + " not in the decompiler list.");
+                    System.err.println("Here are the available decompilers:");
+                    for (String dc : DecompilerRegistry.decompilers.keySet()) {
+                        System.out.println("\t\t" + dc);
+                    }
+                    return;
+                }
+                if (decompilerComparator.classToRun != null) {
+                    project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun), ouputDir, true);
+                } else {
+                    project.run(decompiler, ouputDir);
+                }
             } else {
-                project.run(decompiler,ouputDir);
+                MetaDecompile project = new MetaDecompile(projectDir.getAbsolutePath(), "src/main/java", decompilerComparator.compiler);
+                if (decompilerComparator.classToRun != null) {
+                    project.run(Collections.singletonList(decompilerComparator.classToRun), ouputDir, decompilerComparator.withTests, true);
+                } else {
+                    project.run(ouputDir, decompilerComparator.withTests);
+                }
             }
         }
     }
