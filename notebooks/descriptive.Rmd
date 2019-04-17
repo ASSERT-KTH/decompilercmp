@@ -10,7 +10,6 @@ This notebook shows descriptive statistics of the results obtained with the deco
 ```{r}
 library(tidyverse)
 library(VennDiagram)
-library(venn)
 theme_set(theme_bw())
 
 # Set up a different colour palette
@@ -35,17 +34,18 @@ summary(dataset)
 
 # summary of numeric variables
 dataset %>%
-  filter(!is.na(distanceToOriginal) & !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>%
+  filter(!is.na(distanceToOriginal) &
+           !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>%
   dplyr::select(Decompiler, distanceToOriginal, nbNodesOriginal) %>%
   group_by(Decompiler) %>%
   summarise(
-    min = min(distanceToOriginal/nbNodesOriginal),
-    q25 = quantile(distanceToOriginal/nbNodesOriginal, 0.25),
-    median = median(distanceToOriginal/nbNodesOriginal),
-    q75 = quantile(distanceToOriginal/nbNodesOriginal, 0.75),
-    max = max(distanceToOriginal/nbNodesOriginal),
-    mean = mean(distanceToOriginal/nbNodesOriginal),
-    sd = sd(distanceToOriginal/nbNodesOriginal)
+    min = min(distanceToOriginal / nbNodesOriginal),
+    q25 = quantile(distanceToOriginal / nbNodesOriginal, 0.25),
+    median = median(distanceToOriginal / nbNodesOriginal),
+    q75 = quantile(distanceToOriginal / nbNodesOriginal, 0.75),
+    max = max(distanceToOriginal / nbNodesOriginal),
+    mean = mean(distanceToOriginal / nbNodesOriginal),
+    sd = sd(distanceToOriginal / nbNodesOriginal)
   )
 
 # summary of non-numeric variables
@@ -55,20 +55,69 @@ dataset$passTests <- as.factor(dataset$passTests)
 dataset %>%
   dplyr::select(Decompiler, isRecompilable, passTests) %>%
   group_by(Decompiler) %>%
-  count(isRecompilable, passTests)
+  dplyr::count(isRecompilable, passTests)
 ```
 
-# What is the best decompiler?
+# Which is the best decompiler?
+
+### Semantically admisible vs. semantically correct
+
+```{r}
+dataset %>%
+  dplyr::select(Project,
+                Decompiler,
+                ClassCompiler,
+                passTests,
+                bytecodeDistance) %>%
+  filter(passTests == F & bytecodeDistance == 0)
+```
+
 
 ### Distribution of distance to original
 
 ```{r}
+# Function used to plot the means 
+fun_mean <- function(x) {
+  return(data.frame(
+    y = round(mean(x), digits = 2),
+    label = round(mean(x, na.rm =
+                         T), digits = 2)
+  ))
+}
+
 # Distance to the original
-dataset %>% 
-  filter(!is.na(distanceToOriginal) & !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>% 
-  ggplot(aes(Decompiler, distanceToOriginal/nbNodesOriginal)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0, 1)) +
+dataset %>%
+  filter(!is.na(distanceToOriginal) &
+           !is.na(nbNodesOriginal) & nbNodesOriginal != 0) %>%
+  ggplot(aes(Decompiler, distanceToOriginal / nbNodesOriginal)) +
+  geom_violin(outlier.alpha = 0.2, fill = "#619CFF") +
+  geom_boxplot(width = .1, outlier.colour = NA) +
+  # add the means
+  stat_summary(
+    fun.y = mean,
+    geom = "point",
+    shape = 18,
+    colour = "black",
+    size = 4,
+    position = position_dodge(width = 0.75)
+  ) +
+  stat_summary(
+    fun.y = mean,
+    geom = "point",
+    shape = 18,
+    colour = "#00BA38",
+    size = 3,
+    position = position_dodge(width = 0.75)
+  ) +
+  stat_summary(
+    fun.data = fun_mean,
+    geom = "text",
+    vjust = -0.5,
+    size = 3.5,
+    position = position_dodge(width = 0.75)
+  ) +
+  scale_y_continuous(limits = c(0, 0.5)) +
+  theme(legend.position = "none") +
   coord_flip()
 
 ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
@@ -77,68 +126,135 @@ ggsave(filename = "figures/distances.pdf", device="pdf", height = 4, width = 6, 
 ### Distribution of recompilable and testable types per decompilers
 
 ```{r}
-# Distribution of Recompilable Types for each Decompiler
+# Distribution of Recompilable Classes for each Decompiler
 dataset %>% 
   dplyr::select(Decompiler, isRecompilable) %>% 
   group_by(Decompiler) %>% 
   count(Recompilable = isRecompilable) %>% 
   ggplot(aes(Decompiler, n)) +
   geom_bar(aes(fill = Recompilable), position = "dodge", stat="identity") +
-  ylab("Types") +
-  ggtitle("Distribution of Recompilable Types for each Decompiler") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ylab("Classes") +
+  ggtitle("Distribution of Recompilable Classes for each Decompiler") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggsave(filename = "figures/recompilable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 
 # Distribution of tests results for each Decompiler
-dataset %>% 
-  dplyr::select(Decompiler, passTests) %>% 
-  filter(!is.na(passTests)) %>% 
-  group_by(Decompiler) %>% 
-  count(PassTests = passTests) %>% 
+dataset %>%
+  dplyr::select(Decompiler, passTests) %>%
+  filter(!is.na(passTests)) %>%
+  group_by(Decompiler) %>%
+  count(PassTests = passTests) %>%
   ggplot(aes(Decompiler, n)) +
-  geom_bar(aes(fill = PassTests), position = "dodge", stat="identity") +
+  geom_bar(aes(fill = PassTests), position = "dodge", stat = "identity") +
   ylab("Tests") +
-  ggtitle("Distribution of Tests Results for each Decompiler") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ggtitle("Distribution of Tests Results for each Decompiler") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 
-
 # Distribution of tests results for each Compiler
 dataset %>%
-  filter(Project != "commons-lang" & passTests == TRUE) %>% 
+  filter(Project != "commons-lang" & passTests == TRUE) %>%
   dplyr::select(Decompiler, Compiler, passTests) %>%
   filter(!is.na(passTests)) %>%
   group_by(Decompiler, Compiler) %>%
   count(PassTests = passTests) %>%
   ggplot(aes(Decompiler, n, fill = Compiler)) +
   geom_bar(position = "dodge", stat = "identity") +
+  geom_text(aes(label = n),
+            position = position_dodge(width = 0.9),
+            vjust = -0.3) +
+  ylim(0, 1000) +
   ylab("Tests") +
-  ggtitle("Distribution of Tests Results for each Decompiler") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  scale_fill_manual(values = c("#F8766D", "#619CFF")) +
+  # ggtitle("Distribution of Tests Results for each Compiler") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top")
 
-ggsave(filename = "figures/testable_decompilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+ggsave(filename = "figures/testable_compilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
+
+# javac
+javac <- dataset %>%
+  filter(Compiler == "javac" &
+           isRecompilable == TRUE & passTests == FALSE) %>%
+  mutate(DecClass = paste(as.character(Class), as.character(Decompiler), sep = "&")) %>%
+  dplyr::select(Class, Decompiler, Compiler, passTests, DecClass) %>%
+  dplyr::select(DecClass)
+
+# ecj
+ecj <- dataset %>%
+  filter(Compiler == "ecj" &
+           isRecompilable == TRUE & passTests == FALSE) %>%
+  mutate(DecClass = paste(as.character(Class), as.character(Decompiler), sep = "&")) %>%
+  dplyr::select(Class, Decompiler, Compiler, passTests, DecClass) %>%
+  dplyr::select(DecClass)
+
+# Split string by & using regular expression
+javac_only <- setdiff(javac, ecj) %>%
+  mutate(
+    Class = str_extract(DecClass, "[^&]+"),
+    Decompiler = str_extract(DecClass, "[^&]+$"),
+    Compiler = "javac"
+  ) %>%
+  select(Class, Compiler, Decompiler) %>%
+  group_by(Decompiler, Compiler) %>%
+  summarise(n = n())
+
+ecj_only <- setdiff(ecj, javac) %>%
+  mutate(
+    Class = str_extract(DecClass, "[^&]+"),
+    Decompiler = str_extract(DecClass, "[^&]+$"),
+    Compiler = "ecj"
+  ) %>%
+  select(Class, Compiler, Decompiler) %>%
+  group_by(Decompiler, Compiler) %>%
+  summarise(n = n())
+
+both <- dplyr::intersect(javac, ecj) %>%
+  mutate(
+    Class = str_extract(DecClass, "[^&]+"),
+    Decompiler = str_extract(DecClass, "[^&]+$"),
+    Compiler = "both"
+  ) %>%
+  select(Class, Compiler, Decompiler) %>%
+  group_by(Decompiler, Compiler) %>%
+  summarise(n = n())
+
+separated <- rbind(javac_only, ecj_only)
+
+bind_rows(separated, both) %>%
+  ggplot(aes(Decompiler, n, fill = Compiler)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  geom_text(aes(label = n),
+            position = position_dodge(width = 0.9),
+            vjust = -0.3) +
+  ylab("# Classes") +
+  ylim(0, 62) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top")
+
+ggsave(filename = "figures/r_not_t_compilers.pdf", device="pdf", height = 4, width = 6,  units = c("in"))
 ```
 
 ### Distribution of recompilable and testable types per projects
 
 ```{r}
-# Distribution of Recompilable Types for each Project
+# Distribution of Recompilable Classes for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, isRecompilable) %>%
   group_by(Project, Decompiler) %>%
   count(Decompilable = isRecompilable) %>%
   ggplot(aes(Decompiler, n)) +
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
-  ylab("# Types") +
-  ggtitle("Distribution of Recompilation of Types for each Project") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("# Classes") +
+  ggtitle("Distribution of Recompilation of Classes for each Project") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(Decompilable ~ .)
   
 ggsave(filename = "figures/recompilable_projects.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 
-# Distribution of Testable Types for each Project
+# Distribution of Testable Classes for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, passTests) %>%
   filter(!is.na(passTests)) %>% 
@@ -146,9 +262,9 @@ dataset %>%
   count(Testable = passTests) %>%
   ggplot(aes(Decompiler, n)) +
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
-  ylab("# Types") +
+  ylab("# Classes") +
   ggtitle("Distribution of Tests Results for each Project") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(Testable ~ .)
   
 ggsave(filename = "figures/testable_projects.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
@@ -157,7 +273,7 @@ ggsave(filename = "figures/testable_projects.pdf", device="pdf", height = 5, wid
 ### Distribution of recompilable and testable ratios per projects
 
 ```{r}
-# Distribution of Recompilable Types for each Project
+# Distribution of Recompilable Classes for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, isRecompilable) %>%
   group_by(Project, Decompiler) %>%
@@ -167,12 +283,12 @@ dataset %>%
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
   ylab("Ratio") +
   ggtitle("Distribution of Recompilation Frequencies of each Project") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(Decompilable ~ .)
   
 ggsave(filename = "figures/recompilable_projects_ratios.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 
-# Distribution of Testable Types for each Project
+# Distribution of Testable Classes for each Project
 dataset %>%
   dplyr::select(Project, Decompiler, passTests) %>%
   filter(!is.na(passTests)) %>% 
@@ -183,7 +299,7 @@ dataset %>%
   geom_bar(aes(fill = Project), position = "dodge", stat = "identity") +
   ylab("Ratio") +
   ggtitle("Distribution of Tests Results Frequencies for each Project") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(Testable ~ .)
   
 ggsave(filename = "figures/testable_projects_ratios.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
@@ -198,9 +314,9 @@ dataset %>%
   ggplot(aes(x = reorder(Decompiler, -n), y = n, fill = Project)) +
   geom_col() +
   xlab("Decompiler") +
-  ylab("# Types") +
-  ggtitle("Projects Producing Recompilable Types Which do not Pass the Tests") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+  ylab("# Classes") +
+  ggtitle("Projects Producing Recompilable Classes Which do not Pass the Tests") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 ggsave(filename = "figures/projects_recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 
@@ -226,12 +342,14 @@ dataset %>%
   stat_summary(fun.y = sum, aes(label = ..y.., group = Categories), geom = "text", vjust = -.2) +
   ylim(0, 2500) +
   xlab("Decompiler") +
-  ylab("# Types") +
+  ylab("# Classes") +
   facet_grid(Categories ~ .) +
-  ggtitle("Categories of Ouputs For Each Decompiler") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+  # ggtitle("Categories of Ouputs For Each Decompiler") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 ggsave(filename = "figures/recompilation_categories_results.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
+
+
 ```
 
 Plot the most problematic types
@@ -269,23 +387,130 @@ problematicClasses <- dplyr::left_join(dplyr::left_join(tmp1, tmp2, by="Class"),
 
 table(problematicClasses$Metaproblem)
 
+problematicClasses %>% 
+  filter(Metaproblem == TRUE)
+
 # Sort types by number of decompilers that fail
-tmp <- tmp[order(tmp$n),]
-tmp$Class <- factor(tmp$Class, levels = tmp$Class) 
+tmp1 <- tmp1[order(tmp1$TF),]
+tmp1$Class <- factor(tmp1$Class, levels = tmp1$Class) 
   
-tmp %>% ggplot(aes(Class, n)) +
+tmp1 %>% ggplot(aes(Class, TF)) +
   geom_point(stat = 'identity', fill = "black", size = 2)  +
   geom_segment(aes(
     y = 0,
     x = Class,
-    yend = n,
+    yend = TF,
     xend = Class
   ),
   color = "black") +
   ylab("# Decompilers that Fail Tests") +
-  xlab("Types") +
-  ggtitle("Recompilable Types for Which the Tests Fail") +
+  xlab("Classes") +
+  ggtitle("Recompilable Classes for Which the Tests Fail") +
   coord_flip()
 
 ggsave(filename = "figures/recompilable_types_fail_tests.pdf", device="pdf", height = 5, width = 8,  units = c("in"))
 ```
+
+### Decompilation results for each decompiler
+
+```{r}
+breaks <- c(0, 0.25, 0.5, 0.75, 1)
+tmp <- dataset %>%
+  dplyr::select(Decompiler,
+                Compiler,
+                isDecompilable,
+                isRecompilable,
+                passTests) %>%
+  mutate(Category = ifelse(
+    isDecompilable == FALSE,
+    "NOT D",
+    ifelse(
+      isDecompilable == TRUE & isRecompilable == FALSE,
+      "D AND NOT R",
+      ifelse(isDecompilable == TRUE & isRecompilable == TRUE,
+             "D AND R",
+             "NA")
+    )
+  )) %>%
+  dplyr::select(Decompiler, Compiler, Category) %>%
+  group_by(Decompiler, Compiler, Category) %>%
+  dplyr::summarise(Count = n()) %>%
+  mutate(Perc = round(Count / sum(Count) * 100, digits=1)) 
+
+tmp$Category <- as.factor(tmp$Category)
+# tmp$Category <-  relevel(tmp$Category , 'NOT D')
+tmp$Category <- factor(tmp$Category, levels=c("NOT D", "D AND NOT R", "D AND R"), labels=c( "NOT Dec","Dec NOT Rec","Dec AND Rec"))
+
+tmp %>% ggplot(aes(Compiler, Perc, label = paste0(Perc, "%"), fill = Category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  geom_text(size = 3, position = position_stack(vjust = 0.5)) +
+  scale_y_continuous(labels = scales::percent(breaks), label_value(NULL)) +
+  scale_fill_manual(values = c("#F8766D", "#619CFF",  "#00BA38")) +
+  facet_grid(Decompiler ~ .) +
+  theme(legend.position="top") 
+
+ggsave(filename = "figures/decompilation_categories_results.pdf", device="pdf", height = 6, width = 7,  units = c("in"))
+```
+
+### Ratio ratio bytecode diff=0 vs != 0
+
+```{r}
+# Ratio for all types per decompiler
+dataset %>%
+  na.omit() %>%
+  dplyr::select(Decompiler, Project, isRecompilable, passTests, bytecodeDistance) %>%
+  filter(isRecompilable ==  TRUE & passTests == TRUE) %>% 
+  dplyr::select(Decompiler, bytecodeDistance) %>% 
+  mutate(Diff = as.factor(ifelse(bytecodeDistance == 0, "diffEqual0", "diffNotEqual0"))) %>% 
+  count(Decompiler, Diff) 
+
+# Ratio for all decompilers
+tmp1 <- dataset %>%
+  na.omit() %>%
+  dplyr::select(Decompiler, Project, isRecompilable, passTests, bytecodeDistance, ClassCompiler) %>%
+  filter(isRecompilable ==  TRUE & passTests == TRUE)
+
+# Classes that are recompilable and testable for all decompilers
+tmp2 <- dataset %>%
+  filter(isRecompilable == "TRUE" & passTests == "TRUE" & Compiler == "javac") %>% 
+  select(ClassCompiler, Decompiler, passTests) %>%
+  spread(Decompiler, passTests) %>%
+  filter(
+      `CFR` == T &
+      `Dava` == T &
+      `Fernflower` == T &
+      `JADX` == T &
+      `JD` == T &
+      `Jode` == T &
+      `Krakatau` == T &
+      `Procyon` == T
+  ) %>% 
+  select(ClassCompiler)
+
+# Ratio for the intersection (Classes that recompile and pass test for all decompilers)
+inner_join(tmp1, tmp2, by="ClassCompiler") %>% 
+  dplyr::select(Decompiler, bytecodeDistance) %>% 
+  mutate(Diff = as.factor(ifelse(bytecodeDistance == 0, "diffEqual0", "diffNotEqual0"))) %>% 
+  count(Decompiler, Diff) 
+
+# Plot Recompile and passTests
+dataset %>%
+  na.omit() %>%
+  dplyr::select(Decompiler, Project, isRecompilable, passTests, bytecodeDistance) %>%
+  filter(isRecompilable ==  TRUE & passTests == TRUE) %>% 
+  dplyr::select(Decompiler, bytecodeDistance) %>% 
+  mutate(Equivalence = as.factor(ifelse(bytecodeDistance == 0, "Strict", "Modulo Input"))) %>% 
+  count(Decompiler, Equivalence) %>% 
+  ggplot(aes(x = reorder(Decompiler, -n), y = n, label = n, fill = Equivalence)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#F8766D", "#619CFF",  "#00BA38")) +
+  geom_text(size = 3, position = position_stack(vjust = 0.5)) +
+  ylab("# Classes") +
+  xlab("Decompiler") +
+  theme(legend.position="top") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggsave(filename = "figures/equivalence_categories_results.pdf", device="pdf", height = 4, width = 7,  units = c("in"))
+```
+
