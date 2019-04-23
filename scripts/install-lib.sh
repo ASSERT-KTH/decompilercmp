@@ -22,6 +22,9 @@ wget https://downloads.sourceforge.net/project/jode/jode/1.1.2-pre1/jode-1.1.2-p
 echo "dl jd-gui-1.4.1 ..."
 wget https://github.com/java-decompiler/jd-gui/releases/download/v1.4.1/jd-gui-1.4.1.jar
 
+echo "dl jd-core-1.0.0"
+wget https://github.com/java-decompiler/mvn-repo/raw/1bfc0b146ee07bcf316c2c9af5a1c917cb73012e/org/jd/jd-core/1.0.0/jd-core-1.0.0.jar
+
 echo "dl soot ..."
 wget https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/ca/mcgill/sable/soot/3.3.0/soot-3.3.0-jar-with-dependencies.jar
 
