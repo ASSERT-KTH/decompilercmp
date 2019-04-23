@@ -110,6 +110,7 @@ dev.off()
 
 # Nemenyi Post Hoc Test of Decompilers w.r.t Testable Projects
 testableData <- dataset %>%
+  na.omit() %>% 
   dplyr::select(Project, Decompiler, passTests) %>%
   group_by(Project, Decompiler) %>%
   count(Testable = passTests) %>%
@@ -129,4 +130,93 @@ pdf("figures/cdplot_testable.pdf",
     width = 8)
 plotCD(testableData, alpha = 0.05, cex = 1.25)
 dev.off() 
+
+# Nemenyi Post Hoc Test of Decompilers w.r.t Recompilable and Testable Projects (Meta-Decompiler)
+RTData <- dataset %>%
+  mutate(RandT = ifelse(isRecompilable == TRUE & passTests == TRUE, TRUE, FALSE)) %>% 
+  dplyr::select(Project, Decompiler, RandT) %>%
+  group_by(Project, Decompiler) %>%
+  count(RT = RandT) %>%
+  na.omit() %>%
+  mutate(true_ratio = n / sum(n)) %>%
+  tidyr::complete( Decompiler, RT, fill = list(n = 0)) %>% 
+  ungroup() %>%
+  # select the RT true
+  filter(RT == TRUE) %>% 
+  dplyr::select(Decompiler, true_ratio) %>%
+  # replace NA with 0
+  mutate(true_ratio = ifelse(is.na(true_ratio), 0, true_ratio)) %>% 
+  group_by(Decompiler) %>%
+  mutate(row_id = 1:n()) %>%
+  ungroup() %>%
+  dplyr::select(Decompiler, true_ratio, row_id) %>%
+  spread(key = Decompiler, value = true_ratio) %>%
+  select(-row_id)
+
+test <- nemenyiTest(RTData, alpha = 0.05)
+pdf("figures/cdplot_metad.pdf",
+    height = 5,
+    width = 8)
+plotCD(RTData, alpha = 0.05, cex = 1.25)
+dev.off() 
+
+dataset %>% 
+  filter(Compiler == "javac") %>% 
+  select(Project, Class) %>% 
+  group_by(Project) %>% 
+  summarise(n())
 ```
+
+# Correlation Tests between AST and bytecode distances
+
+```{r}
+tmp <- dataset %>% 
+  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
+  na.omit()
+
+astDist <- tmp$distanceToOriginal
+bytDist <- tmp$bytecodeDistance
+
+# Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for all decompilers
+cor.test(astDist,  bytDist, method = "spearman", alternative= "two.sided", conf.level = 0.95)
+
+# Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for each decompiler
+dataset %>% 
+  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
+  na.omit() %>% 
+  group_by(Decompiler) %>% 
+  dplyr::summarise(rho = cor(distanceToOriginal, bytecodeDistance, method = "spearman"))
+```
+
+
+# T-tests
+
+```{r}
+t_dataset <- dataset %>%
+  dplyr::select(Decompiler,
+                Compiler,
+                isDecompilable,
+                isRecompilable,
+                passTests) %>%
+  mutate(Category = ifelse(
+    isDecompilable == FALSE,
+    "NOT D",
+    ifelse(
+      isDecompilable == TRUE & isRecompilable == FALSE,
+      "D AND NOT R",
+      ifelse(isDecompilable == TRUE & isRecompilable == TRUE,
+             "D AND R",
+             "NA")
+    )
+  )) %>%
+  dplyr::select(Decompiler, Compiler, Category) %>%
+  group_by(Decompiler, Compiler, Category) %>%
+  dplyr::summarise(Count = n()) %>%
+  mutate(Perc = round(Count / sum(Count) * 100, digits=1)) 
+
+ecj_dataset  <- t_dataset %>% 
+  filter(Compiler == "ecj") 
+javac_dataset  <- t_dataset %>% 
+  filter(Compiler == "javac")   
+```
+

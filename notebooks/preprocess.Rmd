@@ -48,7 +48,7 @@ dataset <- dataset %>%
       Decompiler == "Dava-3.3.0",
       "Dava",
       ifelse(
-        Decompiler == "Fernflower-2.5.0.Final",
+        Decompiler == "Fernflower",
         "Fernflower",
         ifelse(
           Decompiler == "JADX-0.9.0",
@@ -72,6 +72,19 @@ dataset <- dataset %>%
       )
     )
   ))
+
+# change compiler name from eclipse to ecj
+dataset <- dataset %>%
+  mutate(Compiler = ifelse(Compiler == "eclipse",
+  "ecj", "javac"))
+
+# add a variable to make the couple class-compiler unique
+dataset <- dataset %>% 
+  mutate(ClassCompiler = paste(Class, Compiler, sep="-"))
+
+# remove Dava decompiler
+# dataset <- dataset %>% 
+#   filter(Decompiler != "Dava")
 ```
 
 ### Save the dataset
