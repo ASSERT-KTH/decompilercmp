@@ -6,7 +6,6 @@ import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.core.v1.api.loader.Loader;
 import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.core.v1.api.printer.Printer;
-import org.jd.gui.view.component.TypePage;
 import se.kth.Decompiler;
 
 import java.io.File;
@@ -24,20 +23,15 @@ public class JDCore implements Decompiler {
 	@Override
 	public boolean decompile(File in, File out, String cl) {
 		try {
-			final File tempClass = in;
 			final File tempJava = new File(out, cl + ".java");
 			File inBase = new File(in.getAbsolutePath().replace(cl + ".class", ""));
 
-			System.out.println("[DEBUG] inBase: " + inBase.getAbsolutePath());
-
-			String pathToClass = in.getAbsolutePath();
-
-			//Preferences preferences = new Preferences();
+			//System.out.println("[DEBUG] inBase: " + inBase.getAbsolutePath());
 
 			Loader loader = new Loader() {
 				@Override
 				public byte[] load(String s) throws LoaderException {
-					System.err.println("[RE] load ? " + s);
+					//System.err.println("[RE] load ? " + s);
 					File file;
 					if(s.startsWith("/"))
 						file = new File(s);
@@ -54,22 +48,19 @@ public class JDCore implements Decompiler {
 
 				@Override
 				public boolean canLoad(String s) {
-					System.err.println("[RE] canLoad ? " + s);
+					//System.err.println("[RE] canLoad ? " + s);
 					File file = new File(inBase, s + ".class");
 					return file.exists() && file.isFile();
 				}
 			};
 
 			PrintStream ps = new PrintStream(tempJava.getAbsolutePath());
-			/*PlainTextPrinter printer = new PlainTextPrinter();
-			printer.setPrintStream(ps);
-			printer.setPreferences(new GuiPreferences(false, false, false, false, false));*/
 			Printer printer = new TextPrinter(ps);
 
-			System.err.println("JDGUI out: " + tempJava.getAbsolutePath());
+			//System.err.println("JDGUI out: " + tempJava.getAbsolutePath());
 
 			org.jd.core.v1.ClassFileToJavaSourceDecompiler decompiler = new ClassFileToJavaSourceDecompiler();
-			decompiler.decompile(new HashMap<String,Object>(), loader, printer, cl);
+			decompiler.decompile(new HashMap<>(), loader, printer, cl);
 
 			return true;
 		} catch (Exception e) {
@@ -114,9 +105,7 @@ public class JDCore implements Decompiler {
 
 		@Override
 		public void printStringConstant(String constant, String ownerInternalName) {
-			//String getRef(this.sb.length(), constant.length(), constant, ownerInternalName));
 			sb.append(constant);
-			//sb.append(ownerInternalName + "." + constant);
 		}
 
 		@Override
@@ -128,7 +117,6 @@ public class JDCore implements Decompiler {
 		public void printDeclaration(int flags, String internalTypeName, String name, String descriptor) {
 			if (DefaultTypeTransformation.booleanUnbox(name))
 			{
-				//((HashMap)getProperty("declarations")).put(StringGroovyMethods.plus(StringGroovyMethods.plus(StringGroovyMethods.plus(StringGroovyMethods.plus(internalTypeName, "-"), name), "-"), descriptor), new TypePage.DeclarationData(this.sb.length(), name.length(), internalTypeName, name, descriptor));
 				this.sb.append(name);
 			}
 		}
