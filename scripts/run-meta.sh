@@ -11,7 +11,7 @@ DECOMPILERS="Meta"
 
 COMPILERS="javac eclipse"
 
-CLASSPATH="target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar"
+CLASSPATH="target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar"
 
 LOG_DIR="log"
 
