@@ -36,7 +36,7 @@ do
 	for c in $COMPILERS
 	do
 		cd $ROOT
-		cd sequences/$repo/$c
+		cd $OUTPUTDIR/$repo/$c
 		echo "COMPILER: $c"
 		#for mainClass in $(find . -type f | grep "\\$" | cut -d '$' -f1 | sort | uniq | sed 's/.\/sequences\/'"$repo"'\/'"$c"'//')
 		for mainClass in $(find . -type f | grep "\\$" | cut -d '$' -f1 | sort | uniq | sed 's/.\///')
@@ -50,3 +50,5 @@ do
 done
 
 cd $ROOT
+cd $OUTPUTDIR
+rm **/*\$*
