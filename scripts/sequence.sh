@@ -2,8 +2,11 @@
 
 ROOT=$(pwd)
 OUTPUTDIR="sequences"
-COMPILERS="javac"
-REPOS="commons-lang Bukkit commons-codec commons-collections commons-imaging dctest DiskLruCache javapoet joda-time jsoup junit4 mimecraft scribejava spark"
+#COMPILERS="javac"
+#REPOS="commons-lang Bukkit commons-codec commons-collections commons-imaging dctest DiskLruCache javapoet joda-time jsoup junit4 mimecraft scribejava spark"
+
+COMPILERS="eclipse"
+REPOS="jsoup"
 
 #repo="dctest"
 #for repo in $(ls repos)
@@ -30,3 +33,7 @@ do
 done
 
 cd $ROOT
+
+chmod g+rw -R $OUTPUTDIR
+chmod o+rw -R $OUTPUTDIR
+
