@@ -24,3 +24,6 @@ do
 done
 
 cd ..
+
+rm repos/commons-imaging/src/main/java/org/apache/commons/imaging/formats/tga/TgaConstants.java
+rm repos/commons-imaging/src/main/java/org/apache/commons/imaging/formats/tga/TgaImageParser.java
