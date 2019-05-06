@@ -12,6 +12,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class JDCore implements Decompiler {
 
@@ -20,8 +27,24 @@ public class JDCore implements Decompiler {
 		return "JD-Core-1.0.0";
 	}
 
-	@Override
 	public boolean decompile(File in, File out, String cl) {
+		Boolean result = null;
+		ExecutorService executor = Executors.newCachedThreadPool();
+		Callable<Boolean> task = () -> decompileAttempt(in, out, cl);
+		Future<Boolean> future = executor.submit(task);
+		try {
+			result = future.get(3*60, TimeUnit.SECONDS);
+		} catch (TimeoutException | InterruptedException | ExecutionException e) {
+			System.err.println(getName() + " failed with e: " + e.getMessage());
+		} finally {
+			future.cancel(true); // may or may not desire this
+		}
+		if(result != null) return result;
+		else return false;
+	}
+
+
+	public boolean decompileAttempt(File in, File out, String cl) {
 		try {
 			final File tempJava = new File(out, cl + ".java");
 			File inBase = new File(in.getAbsolutePath().replace(cl + ".class", ""));
@@ -63,7 +86,7 @@ public class JDCore implements Decompiler {
 			decompiler.decompile(new HashMap<>(), loader, printer, cl);
 
 			return true;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			System.err.println(getName() + " failed with e: " + e.getMessage());
 		}

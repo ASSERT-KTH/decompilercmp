@@ -19,7 +19,7 @@ public class Project {
     static File mavenHome = new File("/usr/share/maven");
     //static File mavenHome = new File("/opt/apache-maven-3.6.0");
     static File tmpDir = new File("tmp");
-    static int testExecutionTimeOut = 20*60;//20 minutes in seconds
+    static int testExecutionTimeOut = 5*60;//5 minutes in seconds
 
     //static String compileGoal = "org.apache.maven.plugins:maven-compiler-plugin:3.7.0:compile";
     static String compileGoal = "compile";
