@@ -14,6 +14,9 @@ library(tidyverse)
 ### Preprocess the data to get the full tidy dataset with all decompilers' results
 
 ```{r message=FALSE, warning=FALSE}
+# Read from the number of bytecode instructions file
+nbBytecodeInstructions <- read.csv("data/bytecode-instructions.csv")
+
 # go to parent directory
 setwd("..")
 reportsDir <- paste(getwd(), "/report/", sep = "")
@@ -54,8 +57,8 @@ dataset <- dataset %>%
           Decompiler == "JADX-0.9.0",
           "JADX",
           ifelse(
-            Decompiler == "JD-GUI-1.4.1",
-            "JD",
+            Decompiler == "JD-Core-1.0.0",
+            "JD-Core",
             ifelse(
               Decompiler == "Jode-1.1.2-pre1",
               "Jode",
@@ -82,6 +85,8 @@ dataset <- dataset %>%
 dataset <- dataset %>% 
   mutate(ClassCompiler = paste(Class, Compiler, sep="-"))
 
+dataset <- left_join(dataset, nbBytecodeInstructions, by = "Class")
+
 # remove Dava decompiler
 # dataset <- dataset %>% 
 #   filter(Decompiler != "Dava")
@@ -91,4 +96,54 @@ dataset <- dataset %>%
 
 ```{r}
 write.csv(dataset, file = "data/dataset.csv", row.names = F)
+```
+
+### Preprocess the data to get the full tidy dataset with the Meta-Decompiler results
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# go to parent directory
+setwd("..")
+reportsDir <- paste(getwd(), "/report-meta/", sep = "")
+# list files of results
+fileList = list.files(
+  path = reportsDir,
+  pattern = "*.csv"
+  )
+
+# final dataset
+dataset_meta <- data.frame(matrix(ncol = 10, nrow = 0))
+colnames(dataset_meta) <- c("Project", "Decompiler", "Compiler", "Class", "isDecompilable", "distanceToOriginal", "nbNodesOriginal", "isRecompilable", "bytecodeDistance", "passTests")
+
+# read and add all the result files into a dataset 
+for (i in 1:length(fileList)) {
+  projectName <- strsplit(fileList[i], ":")[[1]][1]
+  decompilerName <- strsplit(fileList[i], ":")[[1]][2]
+  compilerName <- strsplit(fileList[i], ":")[[1]][3]
+  individualReport <- read_csv(paste(reportsDir, fileList[i], sep = ""), col_names = T)
+  individualReport$Project <- projectName
+  individualReport$Decompiler <- decompilerName
+  individualReport$Compiler <- compilerName
+  dataset_meta <- dplyr::bind_rows(dataset_meta, individualReport)
+}
+
+# change compiler name from eclipse to ecj
+dataset_meta <- dataset_meta %>%
+  mutate(Compiler = ifelse(Compiler == "eclipse",
+  "ecj", "javac"))
+
+# add a variable to make the couple class-compiler unique
+dataset_meta <- dataset_meta %>% 
+  mutate(ClassCompiler = paste(Class, Compiler, sep="-"))
+
+dataset_meta <- left_join(dataset_meta, nbBytecodeInstructions, by = "Class")
+
+# remove Dava decompiler
+# dataset <- dataset %>% 
+#   filter(Decompiler != "Dava")
+```
+
+### Save the dataset-meta
+
+```{r}
+write.csv(dataset_meta, file = "data/dataset_meta.csv", row.names = F)
 ```

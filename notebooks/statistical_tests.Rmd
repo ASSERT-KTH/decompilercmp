@@ -20,6 +20,7 @@ theme_set(theme_bw())
 
 ```{r}
 dataset <- read.csv("data/dataset.csv")
+dataset_meta <- read.csv("data/dataset_meta.csv")
 ```
 
 # Density plots of Decompilers' quality metrics
@@ -132,14 +133,16 @@ plotCD(testableData, alpha = 0.05, cex = 1.25)
 dev.off() 
 
 # Nemenyi Post Hoc Test of Decompilers w.r.t Recompilable and Testable Projects (Meta-Decompiler)
-RTData <- dataset %>%
-  mutate(RandT = ifelse(isRecompilable == TRUE & passTests == TRUE, TRUE, FALSE)) %>% 
+dataset_meta$nbAttempt <- NULL
+RTData <- rbind(dataset, dataset_meta) %>%
+  mutate(RandT = ifelse(isRecompilable == TRUE &
+                          passTests == TRUE, TRUE, FALSE)) %>%
   dplyr::select(Project, Decompiler, RandT) %>%
-  group_by(Project, Decompiler) %>%
+  group_by(Decompiler, Project) %>%
   count(RT = RandT) %>%
   na.omit() %>%
   mutate(true_ratio = n / sum(n)) %>%
-  tidyr::complete( Decompiler, RT, fill = list(n = 0)) %>% 
+  tidyr::complete(Decompiler, RT, fill = list(n = 0)) %>%
   ungroup() %>%
   # select the RT true
   filter(RT == TRUE) %>% 
@@ -153,39 +156,126 @@ RTData <- dataset %>%
   spread(key = Decompiler, value = true_ratio) %>%
   select(-row_id)
 
-test <- nemenyiTest(RTData, alpha = 0.05)
+test <- nemenyiTest(RTData, alpha = 0.01)
 pdf("figures/cdplot_metad.pdf",
     height = 5,
     width = 8)
-plotCD(RTData, alpha = 0.05, cex = 1.25)
+plotCD(RTData, alpha = 0.01, cex = 1.25)
 dev.off() 
 
-dataset %>% 
-  filter(Compiler == "javac") %>% 
-  select(Project, Class) %>% 
-  group_by(Project) %>% 
-  summarise(n())
+
 ```
 
 # Correlation Tests between AST and bytecode distances
 
 ```{r}
 tmp <- dataset %>% 
-  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
-  na.omit()
+  filter(nbInstructions != 0) %>% 
+  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance, nbInstructions, nbNodesOriginal) %>% 
+  na.omit() %>% 
+  mutate(normBytecodeDist = bytecodeDistance/nbInstructions, normASTDist = distanceToOriginal/ nbNodesOriginal) 
 
-astDist <- tmp$distanceToOriginal
-bytDist <- tmp$bytecodeDistance
+astDist <- tmp$normASTDist
+bytDist <- tmp$normBytecodeDist
 
 # Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for all decompilers
 cor.test(astDist,  bytDist, method = "spearman", alternative= "two.sided", conf.level = 0.95)
 
 # Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for each decompiler
-dataset %>% 
-  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
-  na.omit() %>% 
+dataset %>%
+ filter(nbInstructions != 0) %>%
+ dplyr::select(Decompiler,
+                distanceToOriginal,
+                bytecodeDistance,
+                nbInstructions,
+                nbNodesOriginal) %>%
+  na.omit() %>%
+  mutate(
+    normBytecodeDist = bytecodeDistance / nbInstructions,
+    normASTDist = distanceToOriginal / nbNodesOriginal
+  ) %>% 
+  dplyr::select(Decompiler, normBytecodeDist, normASTDist) %>% 
   group_by(Decompiler) %>% 
-  dplyr::summarise(rho = cor(distanceToOriginal, bytecodeDistance, method = "spearman"))
+  dplyr::summarise(rho = cor(normBytecodeDist, normASTDist, method = "spearman"))
+
+# Bytecode equivalence ratio in function of AST distance
+dataset %>%
+  filter(nbInstructions != 0) %>%
+  dplyr::select(Decompiler,
+                distanceToOriginal,
+                bytecodeDistance,
+                nbInstructions,
+                nbNodesOriginal) %>%
+  na.omit() %>%
+  mutate(
+    normBytecodeDist = bytecodeDistance / nbInstructions,
+    normASTDist = distanceToOriginal / nbNodesOriginal
+  ) %>%
+  mutate(sameBytecode = ifelse(bytecodeDistance == 0, TRUE, FALSE)) %>%
+  # group_by(sameBytecode) %>%
+  # count()
+  mutate(distanceASTGroup = ifelse(
+    normASTDist > 0 & normASTDist < 0.05,
+    "0 - 05%",
+    ifelse(
+    normASTDist < 0.1, 
+     "05 - 10%",
+    ifelse(
+      normASTDist < 0.2,
+      "10 - 20%",
+      ifelse(normASTDist < 0.3,  "20 - 30%", 
+              ifelse(normASTDist < 0.4,  "30 - 40%",
+                     "40% +")
+    )))
+  )) %>%
+  group_by(Decompiler, distanceASTGroup, sameBytecode) %>%
+  summarise(n = n()) %>%
+  spread(sameBytecode, n) %>%
+  mutate(sameByteCodeRatio = (`TRUE` / (`TRUE` + `FALSE`))) %>%
+  select(distanceASTGroup,sameByteCodeRatio) %>%
+  ggplot(aes(distanceASTGroup, sameByteCodeRatio, fill = Decompiler)) +
+  geom_bar(position = "dodge", stat = "identity")
+```
+
+# Binomial Test
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Comparison between decompilers
+chisquareTest <- function(datasetName, decompilerName) {
+  tmp <- datasetName %>%
+    dplyr::select(Decompiler,
+                  Compiler,
+                  passTests,
+                  isRecompilable) %>%
+    mutate(Success = ifelse(passTests == TRUE &
+                              isRecompilable == TRUE, TRUE, FALSE)) %>%
+    group_by(Decompiler, Compiler, Success) %>%
+    dplyr::summarise(Count = n()) %>%
+    na.omit() %>%
+    filter(Decompiler == decompilerName) %>%
+    group_by(Compiler, Success) %>%
+    summarise(Count = sum(Count)) %>%
+    spread(Compiler, Count)
+  
+  row.names(tmp) <- tmp$Decompiler
+  dt <- as.table(as.matrix(tmp))
+  return(chisq.test(dt, correct = TRUE))
+}
+
+print("Meta-withtest")
+chisquareTest(dataset_meta, "Meta-withtest")
+
+print("Meta-notest")
+chisquareTest(dataset_meta, "Meta-notest")
+
+decompilers <- dataset %>% select(Decompiler) %>% 
+  unique()
+decompilers <- decompilers$Decompiler 
+
+for(i in 1:length(decompilers)){
+  print(as.character(decompilers[i]))
+  print(chisquareTest(dataset, as.character(decompilers[i])))
+}
 ```
 
 
@@ -212,7 +302,7 @@ t_dataset <- dataset %>%
   dplyr::select(Decompiler, Compiler, Category) %>%
   group_by(Decompiler, Compiler, Category) %>%
   dplyr::summarise(Count = n()) %>%
-  mutate(Perc = round(Count / sum(Count) * 100, digits=1)) 
+  mutate(Perc = round(Count / sum(Count) * 100, digits=1))
 
 ecj_dataset  <- t_dataset %>% 
   filter(Compiler == "ecj") 

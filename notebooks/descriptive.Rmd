@@ -10,6 +10,7 @@ This notebook shows descriptive statistics of the results obtained with the deco
 ```{r}
 library(tidyverse)
 library(VennDiagram)
+library(xtable)
 theme_set(theme_bw())
 
 # Set up a different colour palette
@@ -25,6 +26,7 @@ theme_set(theme_bw())
 
 ```{r}
 dataset <- read.csv("data/dataset.csv")
+dataset_meta <- read.csv("data/dataset_meta.csv")
 ```
 
 # General summary of the dataset
@@ -481,7 +483,7 @@ tmp2 <- dataset %>%
       `Dava` == T &
       `Fernflower` == T &
       `JADX` == T &
-      `JD` == T &
+      `JD-Core` == T &
       `Jode` == T &
       `Krakatau` == T &
       `Procyon` == T
@@ -514,3 +516,25 @@ dataset %>%
 ggsave(filename = "figures/equivalence_categories_results.pdf", device="pdf", height = 4, width = 7,  units = c("in"))
 ```
 
+# Descriptive comparisons of the Meta-Decompiler with the rest of decompilers
+
+```{r}
+dataset_meta$nbAttempt <- NULL
+
+meta_decompiler_comparison <- rbind(dataset, dataset_meta) %>%
+  group_by(Decompiler) %>%
+  mutate(nbNodesOriginal = ifelse(nbNodesOriginal == 0, NA, nbNodesOriginal)) %>%
+  summarise(
+    n = n(),
+    nRecompilable = sum(isRecompilable),
+    nPassTest = sum(passTests, na.rm = TRUE),
+    nBugs = sum(isRecompilable &
+                  !passTests, na.rm = TRUE),
+    meanASTDist = mean(distanceToOriginal / nbNodesOriginal, na.rm = TRUE),
+    meanBytecodeDist = mean(bytecodeDistance, na.rm = TRUE)
+  ) %>%
+  mutate(RecompilationRatio = nRecompilable / n,
+         PassTestRatio = nPassTest / nRecompilable)
+
+xtable(meta_decompiler_comparison)
+```
