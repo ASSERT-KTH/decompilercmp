@@ -5,6 +5,7 @@ import org.json.JSONException;
 import se.kth.decompiler.CFR;
 import se.kth.decompiler.Fernflower;
 import se.kth.decompiler.JADX;
+import se.kth.decompiler.JDCore;
 import se.kth.decompiler.JDGui;
 import se.kth.decompiler.Jode;
 import se.kth.decompiler.Procyon;
@@ -31,12 +32,12 @@ public class MetaDecompile extends Project {
 		super(pathToProject,pathToSources,compilerId);
 		decompilerOrder = new ArrayList<>();
 
+		decompilerOrder.add(new CFR());//Best quality first
 		decompilerOrder.add(new Procyon());
-		decompilerOrder.add(new CFR());
 		decompilerOrder.add(new Fernflower());
 
 		decompilerOrder.add(new JADX());
-		decompilerOrder.add(new JDGui());
+		decompilerOrder.add(new JDCore());
 		decompilerOrder.add(new Jode());
 	}
 

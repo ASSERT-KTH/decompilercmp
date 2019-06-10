@@ -278,6 +278,26 @@ for(i in 1:length(decompilers)){
 }
 ```
 
+# Correlation Tests between AST and bytecode distances
+
+```{r}
+tmp <- dataset %>% 
+  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
+  na.omit()
+
+astDist <- tmp$distanceToOriginal
+bytDist <- tmp$bytecodeDistance
+
+# Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for all decompilers
+cor.test(astDist,  bytDist, method = "spearman", alternative= "two.sided", conf.level = 0.95)
+
+# Use Spearman's rho statistic to estimate a rank-based measure of association between the two distances for each decompiler
+dataset %>% 
+  dplyr::select(Decompiler, distanceToOriginal, bytecodeDistance) %>% 
+  na.omit() %>% 
+  group_by(Decompiler) %>% 
+  dplyr::summarise(rho = cor(distanceToOriginal, bytecodeDistance, method = "spearman"))
+```
 
 # T-tests
 

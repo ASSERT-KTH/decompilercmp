@@ -19,5 +19,7 @@ public class DecompilerRegistry {
 		decompilers.put("Jode-1.1.2-pre1", new Jode());
 		decompilers.put("JADX-0.9.0", new JADX());
 
+		decompilers.put("JD-Core-1.0.0", new JDCore());
+
 	}
 }

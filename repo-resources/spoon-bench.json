@@ -3,7 +3,7 @@
 	{"repo":"commons-codec", "url":"https://github.com/apache/commons-codec.git", "commit":"fe6dbee7524a5aa4160751155be2e8c975f66c68", "packages":"org.apache.commons.codec"},
 	{"repo":"commons-collections", "url":"https://github.com/apache/commons-collections.git", "commit":"a3503a1b569977dc6f8f136dcdcdabe49b8249c1", "packages":"org.apache.commons.collections4"},
 	{"repo":"commons-imaging", "url":"https://github.com/apache/commons-imaging.git", "commit":"92440e4206a12ffd455def326c181058b53b6681", "packages":"org.apache.commons.imaging"},
-	{"repo":"commons-lang", "url":"https://github.com/apache/commons-lang.git", "commit":"3482322192307199d4db1c66e921b7beb6e6dcb6", "packages":"org.apache.commons.lang3"},
+	{"repo":"commons-lang", "url":"https://github.com/apache/commons-lang.git", "commit":"c20dcdadd49bb8371dbcee6a955960760a239aca", "packages":"org.apache.commons.lang3"},
 	{"repo":"DiskLruCache", "url":"https://github.com/JakeWharton/DiskLruCache.git", "commit":"c2965c04a03d016c58323c41223d8e2808adf732", "packages":"com.jakewharton.disklrucache"},
 	{"repo":"joda-time", "url":"https://github.com/JodaOrg/joda-time.git", "commit":"8ddb3fb57078d57cfea00b1f588c9ffa8ffbec03", "packages":"org.joda.time"},
 	{"repo":"jsoup", "url":"https://github.com/jhy/jsoup.git", "commit":"ab7feede4eedee351f320896114394235c2395ef", "packages":"org.jsoup"},
