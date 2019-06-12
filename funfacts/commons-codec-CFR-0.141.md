@@ -25,3 +25,6 @@ while (j < len) {
 ```
 
 instead of `out[i] = (byte)((f |= Hex.toDigit(data[j++], j)) & 255);`
+
+
+Reported and fixed.

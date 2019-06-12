@@ -75,3 +75,7 @@ becomes
         }
     }
 ```
+
+Infinite loop if size equals 1.
+
+Reported [here](https://bitbucket.org/mstrobel/procyon/issues/342/incorrect-control-flow).

@@ -43,3 +43,5 @@ public boolean removeAll(Object key1) {
 Two problems here:
  1. the condition `key1.equals(multi.getKey(0))` is negated in decompiled code.
  2. the body of the if is put outside of the if. (`it.remove(); modified = true;`)
+
+Reported [here](https://github.com/skylot/jadx/issues/687)

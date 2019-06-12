@@ -24,3 +24,5 @@ public class YamlConfiguration extends FileConfiguration {
 ```
 
 Feld initialization is out of order in the decompiled version leading to a NullPointerException in `new Yaml(new YamlConstructor(), this.yamlRepresenter,  this.yamlOptions)` as `this.yamlRepresenter` and `this.yamlOptions` are still null.
+
+Already reported [here](https://github.com/skylot/jadx/issues/678)
