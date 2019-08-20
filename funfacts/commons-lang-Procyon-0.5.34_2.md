@@ -7,15 +7,15 @@ In `org/apache/commons/lang3/time/FastDatePrinter:557`
     }
 
     /**
-     * &lt;p&gt;Performs the formatting by applying the rules to the
-     * specified calendar.&lt;/p&gt;
+     * <p>Performs the formatting by applying the rules to the
+     * specified calendar.</p>;
      *
      * @param calendar  the calendar to format
      * @param buf  the buffer to format into
-     * @param &lt;B&gt; the Appendable class type, usually StringBuilder or StringBuffer.
+     * @param <B> the Appendable class type, usually StringBuilder or StringBuffer.
      * @return the specified string buffer
      */
-    private &lt;B extends Appendable&gt; B applyRules(final Calendar calendar, final B buf) {
+    private <B extends Appendable> B applyRules(final Calendar calendar, final B buf) {
         try {
             for (final Rule rule : mRules) {
                 rule.appendTo(buf, calendar);
@@ -34,7 +34,7 @@ compiled with javac and decompiled with Procyon-0.5.34 becomes
         return this.applyRules(calendar, buf);
     }
 
-    private &lt;B extends Appendable&gt; B applyRules(final Calendar calendar, final B buf) {
+    private <B extends Appendable> B applyRules(final Calendar calendar, final B buf) {
         try {
             for (final Rule rule : this.mRules) {
                 rule.appendTo(buf, calendar);
