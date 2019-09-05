@@ -6,7 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +36,7 @@ public class Project {
     File report;
     String projectName;
     String compilerId;
+    String[] classpath;
 
     public Project(String pathToProject) {
         this(pathToProject, "src/main/java");
@@ -41,6 +45,7 @@ public class Project {
     public Project(String pathToProject, String pathToSources) {
         this(pathToProject,pathToSources,"javac");
     }
+
     public Project(String pathToProject, String pathToSources, String compilerId) {
         originalDir = new File(pathToProject);
         this.pathToSources = pathToSources;
@@ -54,8 +59,12 @@ public class Project {
         run(dc, classes, outputDir, false);
     }
 
-
     public void run(Decompiler dc, List<String> classesToRun, File outputDir, boolean debug) throws IOException, JSONException {
+        run(dc,classesToRun,outputDir,debug, null);
+    }
+
+
+    public void run(Decompiler dc, List<String> classesToRun, File outputDir, boolean debug, File customReport) throws IOException, JSONException {
         workingDir = new File(tmpDir, originalDir.getName());
         if (workingDir.exists()) {
             FileUtils.deleteDirectory(workingDir);
@@ -74,10 +83,16 @@ public class Project {
         //mvn compile original
         compile(originalDir, true);
 
+        //read classpath
+        buildClassPath(originalDir);
+
 
         if(!debug) {
             report = new File(outputDir, projectName + ":" + dc.getName() + ":" + compilerId + ":report.csv");
             FileUtils.write(report, "Class,isDecompilable,distanceToOriginal,nbNodesOriginal,isRecompilable,bytecodeDistance,passTests\n", false);
+        }
+        if(customReport != null) {
+            report = customReport;
         }
 
         for (String cl : classesToRun) {
@@ -104,12 +119,12 @@ public class Project {
             }
 
             //report
-            if(!debug) {
+            if(!debug || customReport != null) {
                 report(cl, isDecompilable, distance, nbNodes, isReCompilable, byteCodeDistance, (tests.get(cl) == null) ? "NA" : ("" + passTests));
             }
 
             //clean up
-            if(!debug) {
+            if(!debug || customReport != null) {
                 restore(cl);
             }
         }
@@ -148,6 +163,64 @@ public class Project {
         } catch (MavenInvocationException e) {
             return false;
         }
+    }
+
+    public void buildClassPath(File dir) {
+        File classpathFile = new File(dir, "classpath.txt");
+        if(!classpathFile.exists()) {
+            File pomFile = new File(dir, "pom.xml");
+            InvocationRequest request = new DefaultInvocationRequest();
+            request.setBatchMode(true);
+            request.setPomFile(pomFile);
+            request.setGoals(Collections.singletonList("dependency:build-classpath"));
+            Properties properties = new Properties();
+            properties.setProperty("mdep.outputFile", classpathFile.getPath());
+            request.setProperties(properties);
+
+
+            request.getOutputHandler(s -> System.out.println(s));
+            request.getErrorHandler(s -> System.out.println(s));
+
+            Invoker invoker = new DefaultInvoker();
+            invoker.setMavenHome(mavenHome);
+            invoker.setWorkingDirectory(dir);
+            invoker.setErrorHandler(s -> System.out.println(s));
+            invoker.setOutputHandler(s -> System.out.println(s));
+            try {
+                invoker.execute(request);
+            } catch (MavenInvocationException e) {
+            }
+        }
+        List<String> classpathElements = new ArrayList<>();
+        try {
+            classpathElements.add(originalDir.getCanonicalPath() + "/target/classes");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Read the content of spoon.classpath.tmp
+        try (BufferedReader br = new BufferedReader(new FileReader(classpathFile))) {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line);
+                line = br.readLine();
+            }
+            if (!"".equals(sb.toString())) {
+                String[] classpath = sb.toString().split(File.pathSeparator);
+                for (String cpe : classpath) {
+                    if (!classpathElements.contains(cpe)) {
+                        classpathElements.add(cpe);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        classpath = classpathElements.toArray(new String[0]);
     }
 
     public boolean test(String tests, boolean debug) {
@@ -205,7 +278,7 @@ public class Project {
     public boolean decompile(Decompiler dc, String cl) {
         File bc = new File(originalDir, "target/classes/" + cl + ".class");
         File output = new File(workingDir, "src/main/java/");
-        boolean dcRes = dc.decompile(bc, output, cl);
+        boolean dcRes = dc.decompile(bc, output, cl, classpath);
         File expected = new File(workingDir, "src/main/java/" + cl + ".java");
         return dcRes && expected.exists();
     }

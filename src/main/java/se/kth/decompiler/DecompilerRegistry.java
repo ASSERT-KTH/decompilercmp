@@ -2,6 +2,7 @@ package se.kth.decompiler;
 
 import se.kth.Decompiler;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,17 @@ public class DecompilerRegistry {
 		decompilers.put("JADX-0.9.0", new JADX());
 
 		decompilers.put("JD-Core-1.0.0", new JDCore());
+
+		decompilers.put("Arlecchino", new NewMetaDecompiler(
+				Arrays.asList(new Decompiler[]{
+						new Procyon(),
+						new CFR(),
+						new Fernflower(),
+						new JDCore(),
+						new Jode(),
+						new JADX()
+				})
+		));
 
 	}
 }

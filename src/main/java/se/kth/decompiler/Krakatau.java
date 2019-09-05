@@ -4,12 +4,11 @@ import se.kth.Decompiler;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Krakatau implements Decompiler {
 	@Override
-	public boolean decompile(File in, File outDir, String cl) {
+	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 		String path = in.getAbsolutePath().replace(cl + ".class", "");
 
 		String mvnHome = null;

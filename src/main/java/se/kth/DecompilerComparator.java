@@ -24,6 +24,9 @@ public class DecompilerComparator {
     private String decompilerName = "CFR-0.141";
     @Parameter(names = {"--debug-class", "-c"}, description = "Optional. Run a single class")
     private String classToRun;
+    @Parameter(names = {"--debug-with-report", "-r"}, description = "Optional. Run a single class, but append report result")
+    private String specialReport;
+
     @Parameter(names = {"--output-dir", "-o"}, description = "Path to output directory. Default: report")
     private  String outputDirPath = "report";
 
@@ -70,7 +73,11 @@ public class DecompilerComparator {
                     return;
                 }
                 if (decompilerComparator.classToRun != null) {
-                    project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun), ouputDir, true);
+                    if(decompilerComparator.specialReport != null) {
+                        project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun), ouputDir, true, new File(decompilerComparator.specialReport));
+                    } else {
+                        project.run(decompiler, Collections.singletonList(decompilerComparator.classToRun), ouputDir, true);
+                    }
                 } else {
                     project.run(decompiler, ouputDir);
                 }
@@ -83,5 +90,7 @@ public class DecompilerComparator {
                 }
             }
         }
+        System.out.println("Done");
+        System.exit(0);
     }
 }

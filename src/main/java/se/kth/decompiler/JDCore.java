@@ -27,7 +27,7 @@ public class JDCore implements Decompiler {
 		return "JD-Core-1.0.0";
 	}
 
-	public boolean decompile(File in, File out, String cl) {
+	public boolean decompile(File in, File out, String cl, String[] classpath) {
 		Boolean result = null;
 		ExecutorService executor = Executors.newCachedThreadPool();
 		Callable<Boolean> task = () -> decompileAttempt(in, out, cl);

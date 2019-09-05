@@ -10,11 +10,9 @@ import com.strobel.decompiler.DecompilationOptions;
 import com.strobel.decompiler.DecompilerSettings;
 import com.strobel.decompiler.PlainTextOutput;
 import org.apache.commons.io.FileUtils;
-import org.benf.cfr.reader.util.MiscUtils;
 import se.kth.Decompiler;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ import java.util.List;
 
 public class Procyon implements Decompiler {
 	@Override
-	public boolean decompile(File in, File outDir, String cl) {
+	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 		try {
 			FileUtils.write(new File(outDir,cl + ".java"), decompileClassNode(in));
 			return true;
