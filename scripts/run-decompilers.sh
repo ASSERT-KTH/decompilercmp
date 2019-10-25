@@ -3,15 +3,15 @@
 
 #PROJECTS="Bukkit commons-collections commons-codec"
 #PROJECTS="javapoet DiskLruCache jsoup mimecraft spark scribejava"
-#PROJECTS="commons-lang commons-imaging"
-PROJECTS="jsoup"
+PROJECTS="commons-lang" # commons-imaging"
+#PROJECTS="jsoup"
 
 #DECOMPILERS="CFR-0.141 Procyon-0.5.34 Jode-1.1.2-pre1 Fernflower-2.5.0.Final Krakatau JD-GUI-1.4.1 Dava-3.3.0 JADX-0.9.0 JD-Core-1.0.0"
-#DECOMPILERS="JD-Core-1.0.0"
+DECOMPILERS="JD-Core-1.0.0"
 
-#COMPILERS="javac"
-COMPILERS="eclipse"
-DECOMPILERS="CFR-0.141 Procyon-0.5.34 Jode-1.1.2-pre1 Fernflower-2.5.0.Final Krakatau JD-GUI-1.4.1 Dava-3.3.0 JADX-0.9.0 JD-Core-1.0.0"
+COMPILERS="javac"
+#COMPILERS="eclipse"
+#DECOMPILERS="CFR-0.141 Procyon-0.5.34 Jode-1.1.2-pre1 Fernflower-2.5.0.Final Krakatau JD-GUI-1.4.1 Dava-3.3.0 JADX-0.9.0 JD-Core-1.0.0"
 
 CLASSPATH="target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar"
 
