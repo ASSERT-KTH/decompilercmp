@@ -31,13 +31,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class NewMetaDecompiler implements Decompiler {
+public class Arlecchino implements Decompiler {
 
-	static boolean bestNotAssembleWhenUnnecessary = true;
+	static boolean bestNotAssembleWhenUnnecessary = false;
+
+	static boolean trustFirstTypeMemberList = false;
+	boolean firstPassIsOver = false;
 
 	File tmpOutputDir = new File("Arlecchino");
 
-	public NewMetaDecompiler(List<Decompiler> decompilers) {
+	public Arlecchino(List<Decompiler> decompilers) {
 		this.decompilers = decompilers;
 		cleanTmpDir();
 	}
@@ -90,10 +93,15 @@ public class NewMetaDecompiler implements Decompiler {
 						.stream()
 						.filter(t -> t.getQualifiedName().equals(cl.replace("/", ".")))
 						.findFirst();
+
+				//If no decompilation output, move on to the next decompiler
 				if(!op.isPresent()) continue;
+
 				CtType aa = op.get();
+
 				System.out.println("[" + getName() + "] Decompiled type found: " + aa.getClass().getName() + ":" + aa.getQualifiedName());
 
+				//Assume that Interfaces, Annotation and Enum will be handled correctly by the first decompiler.
 				if(!(aa instanceof CtClass)) {
 					File toRemove = new File(tmpOutputDir,cl + ".java");
 					FileUtils.moveFile(toRemove, new File(outDir.getAbsolutePath() + "/" + cl + ".java"));
@@ -102,6 +110,7 @@ public class NewMetaDecompiler implements Decompiler {
 
 				JDTBasedSpoonCompiler compiler = (JDTBasedSpoonCompiler) launcher.getModelBuilder();
 
+				//Fill class information
 				if(interfaces == null) {
 					interfaces = aa.getSuperInterfaces();
 				}
@@ -115,6 +124,7 @@ public class NewMetaDecompiler implements Decompiler {
 					modifiers = aa.getModifiers();
 				}
 
+				//Check for compilation error in decompiled code and categorized them by type member
 				List<CategorizedProblem> problems = compiler.getProblems()
 						.stream()
 						.filter(p -> p.isError())
@@ -122,6 +132,7 @@ public class NewMetaDecompiler implements Decompiler {
 						.collect(Collectors.toList());
 				System.out.println("[" + getName() + "] Type contains " + problems.size() + " problems.");
 
+				//When a single decompiler handle correctly the class, take directly its solution
 				if(bestNotAssembleWhenUnnecessary && (problems.size() == 0)) {
 					System.out.println("[" + getName() + "] Use " + dc.getName() + "'s solution.");
 					File toRemove = new File(tmpOutputDir,cl + ".java");
@@ -129,6 +140,7 @@ public class NewMetaDecompiler implements Decompiler {
 					return true;
 				}
 
+				//If not, let's store the new type members correctly decompiled (i.e. without decompilation error)
 				aa.getTypeMembers()
 						.stream()
 						.forEach(tm -> addToMap(((CtTypeMember) tm), typeMembers, problems));
@@ -136,13 +148,18 @@ public class NewMetaDecompiler implements Decompiler {
 				System.out.println("[" + getName() + "] Type contains " + typeMembers.values().stream().filter(l -> l.isEmpty()).count() + " remaining problems.");
 				System.out.println("[" + getName() + "] Type contains " + typeMembers.keySet().size() + " type members.");
 
+				//If no incorrectly decompiled type member remain, call it a day.
 				success = typeMembers.values().stream().map(l -> !l.isEmpty()).reduce(Boolean::logicalAnd).get();
 				System.out.println("[" + getName() + "] Type is correct ? " + success);
 
+				//CLean up
 				File toRemove = new File(tmpOutputDir,cl + ".java");
 				toRemove.delete();
 
-			} catch (IOException e) {
+				firstPassIsOver = true;
+
+			} catch (Exception e) {
+				//Spoon or the decompiler may crash, just go on with the next one.
 				e.printStackTrace();
 			}
 
@@ -151,6 +168,7 @@ public class NewMetaDecompiler implements Decompiler {
 			}
 		}
 		if(success)
+			//Assemble the solution from correct type members
 			mergeResults(cl.replace("/","."), outDir.getAbsolutePath(), superClass, interfaces,formalParameters, modifiers, typeMembers);
 		return success;
 	}
@@ -219,7 +237,7 @@ public class NewMetaDecompiler implements Decompiler {
 		} else {
 			key = ((CtExecutable) tm).getSignature();
 		}
-		if (!tm.isImplicit()) {
+		if (!tm.isImplicit() && !(trustFirstTypeMemberList && firstPassIsOver)) {
 			if (!map.containsKey(key)) map.put(key, new ArrayList<>());
 
 			if (!hasProblem(problems, tm))

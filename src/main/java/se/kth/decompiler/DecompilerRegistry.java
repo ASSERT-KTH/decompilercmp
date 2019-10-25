@@ -22,16 +22,20 @@ public class DecompilerRegistry {
 
 		decompilers.put("JD-Core-1.0.0", new JDCore());
 
-		decompilers.put("Arlecchino", new NewMetaDecompiler(
-				Arrays.asList(new Decompiler[]{
-						new Procyon(),
-						new CFR(),
-						new Fernflower(),
-						new JDCore(),
-						new Jode(),
-						new JADX()
-				})
-		));
+		decompilers.put("Arlecchino",
+			new Arlecchino(
+				Arrays.asList(
+					new CFR(),
+					new Fernflower(),
+					new Procyon(),
+					new JDCore(),
+					new JADX(),
+					new Jode(),
+					new Dava(),
+					new Krakatau()
+				)
+			)
+		);
 
 	}
 }
