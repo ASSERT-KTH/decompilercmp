@@ -34,7 +34,7 @@ b <- dataset %>%
   select(ClassCompiler)
 
 c <- dataset %>% 
-  filter(Decompiler == "JD" & isRecompilable == "TRUE") %>% 
+  filter(Decompiler == "JD-Core" & isRecompilable == "TRUE") %>% 
   select(ClassCompiler)
 
 d <- dataset %>% 
@@ -58,9 +58,9 @@ h <- dataset %>%
   select(ClassCompiler)
 
 # decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, g$ClassCompiler)
-# snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
+# snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "Dava")
 decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, h$ClassCompiler)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "JADX")
+snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "JADX")
 pdf("figures/venn_diagram_recompilable.pdf")
 venn(
   decompilersToPlot,
@@ -79,7 +79,7 @@ dataset %>%
       `Dava` == F &
       `Fernflower` == F &
       `JADX` == F &
-      `JD` == F &
+      `JD-Core` == F &
       `Jode` == F &
       `Krakatau` == F &
       `Procyon` == F
@@ -98,7 +98,7 @@ b <- dataset %>%
   select(ClassCompiler)
 
 c <- dataset %>% 
-  filter(Decompiler == "JD" & passTests == "TRUE") %>% 
+  filter(Decompiler == "JD-Core" & passTests == "TRUE") %>% 
   select(ClassCompiler)
 
 d <- dataset %>% 
@@ -122,9 +122,9 @@ h <- dataset %>%
   select(ClassCompiler)
 
 # decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, g$ClassCompiler)
-# snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
+# snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "Dava")
 decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, h$ClassCompiler)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "JADX")
+snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "JADX")
 pdf("figures/venn_diagram_testable.pdf")
 venn(
   decompilersToPlot,
@@ -143,7 +143,7 @@ dataset %>%
       `Dava` == T &
       `Fernflower` == T &
       `JADX` == T &
-      `JD` == T &
+      `JD-Core` == T &
       `Jode` == T &
       `Krakatau` == T &
       `Procyon` == T
@@ -162,7 +162,7 @@ b <- dataset %>%
   select(ClassCompiler)
 
 c <- dataset %>% 
-  filter(Decompiler == "JD" & isRecompilable == "TRUE" & passTests == "TRUE") %>% 
+  filter(Decompiler == "JD-Core" & isRecompilable == "TRUE" & passTests == "TRUE") %>% 
   select(ClassCompiler)
 
 d <- dataset %>% 
@@ -186,7 +186,7 @@ h <- dataset %>%
   select(ClassCompiler)
 
 decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, h$ClassCompiler)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "JADX")
+snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "JADX")
 pdf("figures/venn_diagram_recompilable_and_testable.pdf")
 venn(
   decompilersToPlot,
@@ -209,7 +209,7 @@ b <- dataset %>%
   select(ClassCompiler)
 
 c <- dataset %>%
-  filter(Decompiler == "JD" & passTests == "FALSE") %>%
+  filter(Decompiler == "JD-Core" & passTests == "FALSE") %>%
   select(ClassCompiler)
 
 d <- dataset %>%
@@ -233,9 +233,9 @@ h <- dataset %>%
   select(ClassCompiler)
 
 # decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, g$ClassCompiler)
-# snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
+# snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "Dava")
 decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, h$ClassCompiler)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "JADX")
+snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "JADX")
 pdf("figures/venn_diagram_failures.pdf")
   venn(
     decompilersToPlot,
@@ -271,7 +271,7 @@ b <- join_dataset %>%
   select(ClassCompiler)
 
 c <- join_dataset %>%
-  filter(Decompiler.y == "JD" & passTests.y == "TRUE") %>%
+  filter(Decompiler.y == "JD-Core" & passTests.y == "TRUE") %>%
   select(ClassCompiler)
 
 d <- join_dataset %>%
@@ -295,9 +295,9 @@ h <- join_dataset %>%
   select(ClassCompiler)
 
 # decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, g$ClassCompiler)
-# snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "Dava")
+# snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "Dava")
 decompilersToPlot <- list(a$ClassCompiler, b$ClassCompiler, c$ClassCompiler, d$ClassCompiler, e$ClassCompiler, f$ClassCompiler, h$ClassCompiler)
-snames <- c("CFR", "Procyon",  "JD", "Jode", "Krakatau", "Fernflower", "JADX")
+snames <- c("CFR", "Procyon",  "JD-Core", "Jode", "Krakatau", "Fernflower", "JADX")
 pdf("figures/venn_diagram_types_others_fail.pdf")
   venn(
     decompilersToPlot,

@@ -49,3 +49,5 @@ Here the decompiler mistakenly remove the class name `Bukkit` (which would be co
      INVOKEINTERFACE org/bukkit/Server.getLogger ()Ljava/util/logging/Logger; (itf)
      NEW java/lang/StringBuilder
 ```
+
+Should be fixed by now? See [here](https://github.com/skylot/jadx/issues/458)

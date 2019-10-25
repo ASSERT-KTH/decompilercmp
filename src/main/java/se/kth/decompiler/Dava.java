@@ -1,17 +1,14 @@
 package se.kth.decompiler;
 
 import org.apache.commons.io.FileUtils;
-import soot.Main;
 import se.kth.Decompiler;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class Dava implements Decompiler {
 
     @Override
-    public boolean decompile(File in, File outputDir, String cl) {
+    public boolean decompile(File in, File outputDir, String cl, String[] classpath) {
         File inBase = new File(in.getAbsolutePath().replace(cl + ".class", ""));
         //"/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar" + ":" +
         try {

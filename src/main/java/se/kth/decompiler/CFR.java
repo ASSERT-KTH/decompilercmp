@@ -7,7 +7,7 @@ import java.io.File;
 
 public class CFR implements Decompiler {
 	@Override
-	public boolean decompile(File in, File outputDir, String cl) {
+	public boolean decompile(File in, File outputDir, String cl, String[] classpath) {
 		Main.main(new String[]{in.getAbsolutePath(), "--outputdir", outputDir.getAbsolutePath()});
 		return true;
 	}

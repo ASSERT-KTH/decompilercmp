@@ -1,8 +1,5 @@
 package se.kth.decompiler;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 
 public class DavaTest {
@@ -27,6 +24,6 @@ public class DavaTest {
         File out = new File("src/test/resources/");
 
         System.out.println(in.getAbsolutePath());
-        dava.decompile(in, out, "");
+        dava.decompile(in, out, "", new String[0]);
     }
 }

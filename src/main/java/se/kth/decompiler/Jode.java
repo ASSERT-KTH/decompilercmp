@@ -7,7 +7,7 @@ import java.io.File;
 
 public class Jode implements Decompiler {
 	@Override
-	public boolean decompile(File in, File outDir, String cl) {
+	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 		File inBase = new File(in.getAbsolutePath().replace(cl + ".class",""));
 		try {
 			Main.decompile(new String[]{"-d", outDir.getAbsolutePath(), "-c", inBase.getAbsolutePath(), cl.replace("/", ".")});

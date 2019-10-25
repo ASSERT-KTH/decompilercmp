@@ -1,8 +1,5 @@
 package se.kth.decompiler;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 
 public class JADXTest {
@@ -20,6 +17,6 @@ public class JADXTest {
         File in = new File("src/test/resources/DiffImpl.class");
         File out = new File("src/test/resources/");
 
-        jadx.decompile(in, out, "");
+        jadx.decompile(in, out, "", new String[0]);
     }
 }

@@ -24,3 +24,5 @@ for (int i = 0; i < nBools; ++i) {
 ```
 
 `(long) 1L << shift` becomes `(long) (1 << shift)`
+
+Reported [here](https://bitbucket.org/mstrobel/procyon/issues/341/inccorrect-cast).

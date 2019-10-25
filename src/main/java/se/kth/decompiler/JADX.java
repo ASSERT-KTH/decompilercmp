@@ -9,7 +9,7 @@ import java.io.File;
 public class JADX implements Decompiler {
 
     @Override
-    public boolean decompile(File in, File outputDir, String cl) {
+    public boolean decompile(File in, File outputDir, String cl, String[] classpath) {
 
         File inBase = new File(in.getAbsolutePath().replace(cl + ".class", ""));
         try {

@@ -3,9 +3,7 @@ package se.kth.decompiler;
 import jd.core.loader.Loader;
 import jd.core.loader.LoaderException;
 import jd.core.preferences.Preferences;
-import jd.core.util.ClassFileUtil;
 import jd.core.process.DecompilerImpl;
-import jd.core.util.TypeNameUtil;
 import org.jd.gui.util.decompiler.GuiPreferences;
 import org.jd.gui.util.decompiler.PlainTextPrinter;
 import se.kth.Decompiler;
@@ -25,7 +23,7 @@ public class JDGui implements Decompiler {
 	}
 
 	@Override
-	public boolean decompile(File in, File out, String cl) {
+	public boolean decompile(File in, File out, String cl, String[] classpath) {
 		try {
 			final File tempClass = in;
 			final File tempJava = new File(out, cl + ".java");

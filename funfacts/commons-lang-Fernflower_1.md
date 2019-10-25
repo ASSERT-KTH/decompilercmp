@@ -14,3 +14,5 @@ return (Number)(hexDigits <= 8 && (hexDigits != 8 || lastChar <= '7') ? createIn
 ```
 
 `(hexDigits <= 8 && (hexDigits != 8 || lastChar <= '7') ? createInteger(str) : createLong(str))` is always Long while the original returns an Integer or a Long depending on condition.
+
+Reported by email.

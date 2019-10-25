@@ -1,6 +1,5 @@
 package se.kth.decompiler;
 
-import org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler;
 import se.kth.Decompiler;
 
 import java.io.BufferedReader;
@@ -9,7 +8,7 @@ import java.io.InputStreamReader;
 
 public class Fernflower implements Decompiler {
 	@Override
-	public boolean decompile(File in, File outDir, String cl) {
+	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 		String dir = cl.substring(0,cl.lastIndexOf("/"));
 		File o = new File(outDir,dir);
 		try {
