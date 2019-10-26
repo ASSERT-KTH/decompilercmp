@@ -72,6 +72,8 @@ public class Arlecchino implements Decompiler {
 
 		boolean success = false;
 
+		boolean isFirst = true;
+
 		for(Decompiler dc: decompilers) {
 			try {
 				cleanTmpDir();
@@ -133,12 +135,13 @@ public class Arlecchino implements Decompiler {
 				System.out.println("[" + getName() + "] Type contains " + problems.size() + " problems.");
 
 				//When a single decompiler handle correctly the class, take directly its solution
-				if(bestNotAssembleWhenUnnecessary && (problems.size() == 0)) {
+				if((bestNotAssembleWhenUnnecessary || isFirst) && (problems.size() == 0)) {
 					System.out.println("[" + getName() + "] Use " + dc.getName() + "'s solution.");
 					File toRemove = new File(tmpOutputDir,cl + ".java");
 					FileUtils.moveFile(toRemove, new File(outDir.getAbsolutePath() + "/" + cl + ".java"));
 					return true;
 				}
+				isFirst = false;
 
 				//If not, let's store the new type members correctly decompiled (i.e. without decompilation error)
 				aa.getTypeMembers()
