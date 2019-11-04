@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class Arlecchino implements Decompiler {
 
-	static File arlecchinoLogs = new File("arlechio-logs");
+	static File arlecchinoLogs = new File("arlecchino-logs");
 
 	static boolean bestNotAssembleWhenUnnecessary = false;
 
@@ -70,15 +70,10 @@ public class Arlecchino implements Decompiler {
 	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 
 		boolean success = false,
-				isSuperClassFilled = false,
 				isSuperInterfacesFilled = false,
 				isFormalTypeParameterFilled = false,
 				isSuperModifiersFilled = false;
 		Map<String, List<CtTypeMember>> typeMembers;
-		/*Set<CtTypeReference<?>> interfaces = null;
-		List<CtTypeParameter> formalParameters = null;
-		CtTypeReference superClass = null;
-		Set<ModifierKind> modifiers = null;*/
 
 		final Launcher launcherOutput = new Launcher();
 		//launcherOutput.getEnvironment().setNoClasspath(true);
@@ -199,6 +194,7 @@ public class Arlecchino implements Decompiler {
 				if(success) {
 					break;
 				}
+
 			}
 			if(success)
 				//Assemble the solution from correct type members
@@ -215,36 +211,9 @@ public class Arlecchino implements Decompiler {
 		return "Arlecchino";
 	}
 
-
-
-	/*public void mergeResults(String className, String outDir,
-	                         CtTypeReference superClass,
-	                         Set<CtTypeReference<?>> interfaces,
-	                         List<CtTypeParameter> formalParameters,
-	                         Set<ModifierKind> modifiers,
-	                         Map<String, List<CtTypeMember>> typeMembers) {*/
-
 	public void mergeResults(String className, Launcher launcherOutput,
 				CtClass outputClass,
 				Map<String, List<CtTypeMember>> typeMembers) {
-		/*final Launcher launcherOutput = new Launcher();
-		//launcherOutput.getEnvironment().setNoClasspath(true);
-		launcherOutput.setSourceOutputDirectory(outDir);
-
-		CtClass outputClass = launcherOutput.getFactory().createClass(className);
-
-		if(superClass != null) {
-			outputClass.setSuperclass(superClass);
-		}
-		if(interfaces != null && !interfaces.isEmpty()) {
-			outputClass.setSuperInterfaces(interfaces);
-		}
-		if(formalParameters != null && !formalParameters.isEmpty()) {
-			outputClass.setFormalCtTypeParameters(formalParameters);
-		}
-		if(modifiers != null && !modifiers.isEmpty()) {
-			outputClass.setModifiers(modifiers);
-		}*/
 
 		for(String key: typeMembers.keySet()) {
 			if(key.equals("<clinit>()") && typeMembers.get(key).size() > 1) {
