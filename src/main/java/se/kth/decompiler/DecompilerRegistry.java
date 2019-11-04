@@ -25,9 +25,9 @@ public class DecompilerRegistry {
 		decompilers.put("Arlecchino",
 			new Arlecchino(
 				Arrays.asList(
+					new Procyon(),
 					new CFR(),
 					new Fernflower(),
-					new Procyon(),
 					new JDCore(),
 					new JADX(),
 					new Jode(),
