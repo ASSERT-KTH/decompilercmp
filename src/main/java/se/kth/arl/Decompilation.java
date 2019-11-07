@@ -70,6 +70,8 @@ public class Decompilation {
 			//There are problem with the Class structure that won't be overcome
 			doomed = true;
 			System.out.println("[" + decompilerName + "] Solution is Doomed! ------------------");
+		} else if (rProblems.size() > problems.size()) {
+			System.out.println("[" + decompilerName + "] Weird!!!!!!!!!!!!!! ------------------");
 		}
 	}
 
@@ -170,6 +172,9 @@ public class Decompilation {
 	}
 
 	public static boolean hasProblem(List<CategorizedProblem> problems, CtElement element) {
+		if (element.isImplicit()) {
+			return false;
+		}
 		try {
 			SourcePosition position = element.getPosition();
 			int begin = position.getLine();
@@ -179,18 +184,24 @@ public class Decompilation {
 				int line = problem.getSourceLineNumber();
 				has |= line >= begin && line <= end;
 			}
-			if(!has && element instanceof CtExecutable) {
-				CtExecutable executable = (CtExecutable) element;
-				if(executable.getBody().getStatements().size() == 1) {
-					CtStatement stmt = executable.getBody().getStatements().get(0);
-					if(stmt instanceof CtThrow) {
-						CtThrow ctThrow = (CtThrow) stmt;
-						String ex = ctThrow.getThrownExpression().getType().getQualifiedName();
-						if(ex.contains("IllegalStateException")) {
-							has = true;
+			if(has) return has;
+			try {
+				if(element instanceof CtExecutable) {
+					CtExecutable executable = (CtExecutable) element;
+					if (executable.getBody() != null && executable.getBody().getStatements().size() == 1) {
+						CtStatement stmt = executable.getBody().getStatements().get(0);
+						if (stmt instanceof CtThrow) {
+							CtThrow ctThrow = (CtThrow) stmt;
+							String ex = ctThrow.getThrownExpression().getType().getQualifiedName();
+							if (ex.contains("IllegalStateException")) {
+								return true;
+							}
 						}
 					}
 				}
+			} catch (Exception e) {
+				System.err.println("small Problem");
+				return false;
 			}
 			return has;
 		} catch (Exception e) {
