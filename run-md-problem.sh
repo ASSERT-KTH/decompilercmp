@@ -8,25 +8,7 @@ fi
 
 DECOMPILER=$1
 
-
-
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/ico/IcoImageParser
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/wbmp/WbmpImageParser
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/xbm/XbmImageParser
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/gif/GifImageParser
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/psd/PsdImageParser
-java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/commons-imaging -c org/apache/commons/imaging/formats/png/PngImageParser
-
-
-
-
-
-
-
-
-
-
-
+#org.apache.commons.imaging.formats.psd.PsdImageParser
 
 
 java -cp target/decompiler-cmp-1.0-SNAPSHOT-jar-with-dependencies.jar:lib/jd-core-1.0.0.jar:lib/jd-gui-1.4.1.jar:lib/jode-1.1.2-pre1.jar:lib/sootclasses-trunk-jar-with-dependencies.jar se.kth.DecompilerComparator -d $DECOMPILER -j javac -r ${DECOMPILER}-report.csv -p repos/Bukkit -c org/bukkit/configuration/file/YamlRepresenter
