@@ -71,7 +71,7 @@ repos/commons-collections/target/classes/org/apache/commons/collections4/map/Unm
 repos/commons-collections/target/classes/org/apache/commons/collections4/map/AbstractLinkedMap.class
 repos/commons-collections/target/classes/org/apache/commons/collections4/functors/PrototypeFactory.class
 repos/commons-collections/target/classes/org/apache/commons/collections4/trie/AbstractPatriciaTrie.class
-repos/commons-imaging/target/classes/repos/commons-imaging/target/classes/org/apache/commons/imaging/palette/Dithering.class
+repos/commons-imaging/target/classes/org/apache/commons/imaging/palette/Dithering.class
 repos/commons-imaging/target/classes/org/apache/commons/imaging/formats/ico/IcoImageParser.class
 repos/commons-imaging/target/classes/org/apache/commons/imaging/formats/wbmp/WbmpImageParser.class
 repos/commons-imaging/target/classes/org/apache/commons/imaging/formats/xbm/XbmImageParser.class

@@ -14,10 +14,7 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtTypeMember;
-import spoon.reflect.declaration.CtTypeParameter;
-import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.support.compiler.jdt.JDTBasedSpoonCompiler;
 import spoon.support.reflect.cu.position.PartialSourcePositionImpl;
@@ -29,25 +26,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Arlecchino implements Decompiler {
 
-	static File arlecchinoLogs = new File("arlecchino-logs");
+	File arlecchinoLogs = new File("arlecchino-logs");
 
-	static boolean bestNotAssembleWhenUnnecessary = false;
+	boolean bestNotAssembleWhenUnnecessary = false;
 
-	static boolean readMemberListFromDc = true;
+	boolean readMemberListFromDc = true;
 
-	static boolean trustFirstTypeMemberList = false;
+	boolean trustFirstTypeMemberList = false;
 
 	boolean firstPassIsOver = false;
 
 	File tmpOutputDir = new File("Arlecchino");
-
 	public Arlecchino(List<Decompiler> decompilers) {
+		this(decompilers, false);
+	}
+
+	public Arlecchino(List<Decompiler> decompilers, boolean readMemberListFromDc) {
 		this.decompilers = decompilers;
+		this.readMemberListFromDc = readMemberListFromDc;
 		cleanTmpDir();
 	}
 

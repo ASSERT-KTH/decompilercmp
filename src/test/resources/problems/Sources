@@ -71,7 +71,7 @@ repos/commons-collections/src/main/java/org/apache/commons/collections4/map/Unmo
 repos/commons-collections/src/main/java/org/apache/commons/collections4/map/AbstractLinkedMap.java
 repos/commons-collections/src/main/java/org/apache/commons/collections4/functors/PrototypeFactory.java
 repos/commons-collections/src/main/java/org/apache/commons/collections4/trie/AbstractPatriciaTrie.java
-repos/commons-imaging/src/main/java/repos/commons-imaging/src/main/java/org/apache/commons/imaging/palette/Dithering.java
+repos/commons-imaging/src/main/java/org/apache/commons/imaging/palette/Dithering.java
 repos/commons-imaging/src/main/java/org/apache/commons/imaging/formats/ico/IcoImageParser.java
 repos/commons-imaging/src/main/java/org/apache/commons/imaging/formats/wbmp/WbmpImageParser.java
 repos/commons-imaging/src/main/java/org/apache/commons/imaging/formats/xbm/XbmImageParser.java

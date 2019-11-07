@@ -104,7 +104,7 @@ public class Project {
             boolean passTests = false;
 
             //init
-            removeClass(cl);
+	        removeClass(cl);
 
             isDecompilable = decompile(dc, cl);
             if (isDecompilable) {

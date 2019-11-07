@@ -36,6 +36,47 @@ public class DecompilerRegistry {
 				)
 			)
 		);
+		decompilers.put("MetaDecompiler", new MetaDecompiler(
+				Arrays.asList(
+						new Procyon(),
+						new CFR(),
+						new Fernflower(),
+						new JDCore(),
+						new JADX(),
+						new Jode(),
+						new Dava(),
+						new Krakatau()
+				)
+			)
+		);
+
+		decompilers.put("Arlecchino-CFR",
+				new Arlecchino(
+						Arrays.asList(
+								new CFR(),
+								new Procyon(),
+								new Fernflower(),
+								new JDCore(),
+								new JADX(),
+								new Jode(),
+								new Dava(),
+								new Krakatau()
+						)
+				)
+		);
+		decompilers.put("MetaDecompiler-CFR", new MetaDecompiler(
+						Arrays.asList(
+								new CFR(),
+								new Procyon(),
+								new Fernflower(),
+								new JDCore(),
+								new JADX(),
+								new Jode(),
+								new Dava(),
+								new Krakatau()
+						)
+				)
+		);
 
 	}
 }

@@ -67,6 +67,7 @@ public class ClassAPIVisitor extends ClassVisitor implements Opcodes {
 			SigVisitor v = new SigVisitor(api, factory, toBuild);
 			SignatureReader r = new SignatureReader(signature);
 			r.accept(v);
+			v.finish();
 			System.out.println(signature);
 		} else {
 			if(superName != null && !superName.equals("java/lang/Object")) {
@@ -137,14 +138,20 @@ public class ClassAPIVisitor extends ClassVisitor implements Opcodes {
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc,
 	                               String signature, Object value) {
-		classApi.put(packageName + "." + className + "#" + name, new LinkedList<>());
+		//Field is not synthetic
+		if((access & Opcodes.ACC_SYNTHETIC) == 0) {
+			classApi.put(packageName + "." + className + "#" + name, new LinkedList<>());
+		}
 		return cv.visitField(access, name, desc, signature, value);
 	}
 
 	@Override
 	public void visitInnerClass(String name, String outerName, String innerName, int access) {
 		if(outerName != null && outerName.replace("/",".").equals(packageName + "." + className)) {
-			classApi.put(packageName + "." + className + "$" + innerName, new LinkedList<>());
+			//InnerClass is not synthetic
+			if((access & Opcodes.ACC_SYNTHETIC) == 0) {
+				classApi.put(packageName + "." + className + "$" + innerName, new LinkedList<>());
+			}
 		}
 	}
 
