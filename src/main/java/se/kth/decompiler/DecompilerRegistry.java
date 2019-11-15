@@ -77,6 +77,19 @@ public class DecompilerRegistry {
 						)
 				)
 		);
+		decompilers.put("Exp-MD", new MetaDecompiler(
+						Arrays.asList(
+								new Dava(),
+								new JADX(),
+								new JDCore(),
+								new Jode(),
+								new Krakatau(),
+								new Fernflower(),
+								new CFR(),
+								new Procyon()
+						)
+				)
+		);
 
 	}
 }

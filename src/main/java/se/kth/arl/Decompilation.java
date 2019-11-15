@@ -4,48 +4,27 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import se.kth.asm.ClassAPIVisitor;
 import spoon.Launcher;
-import spoon.reflect.code.CtComment;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.code.CtThrow;
 import spoon.reflect.cu.CompilationUnit;
 import spoon.reflect.cu.SourcePosition;
-import spoon.reflect.declaration.CtAnnotation;
-import spoon.reflect.declaration.CtAnonymousExecutable;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtModifiable;
-import spoon.reflect.declaration.CtNamedElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtTypeMember;
-import spoon.reflect.declaration.ModifierKind;
-import spoon.reflect.declaration.ParentNotInitializedException;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.path.CtPath;
-import spoon.reflect.path.CtRole;
-import spoon.reflect.reference.CtReference;
-import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
-import spoon.reflect.visitor.CtVisitor;
-import spoon.reflect.visitor.Filter;
-import spoon.reflect.visitor.chain.CtConsumableFunction;
-import spoon.reflect.visitor.chain.CtFunction;
-import spoon.reflect.visitor.chain.CtQuery;
 import spoon.support.compiler.jdt.JDTBasedSpoonCompiler;
-import spoon.support.reflect.CtExtendedModifier;
 import spoon.support.reflect.cu.position.PartialSourcePositionImpl;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Decompilation {
@@ -159,6 +138,7 @@ public class Decompilation {
 					.filter(p -> new String(p.getOriginatingFileName()).equals(filePath))
 					.collect(Collectors.toList());
 			success = problems.isEmpty();
+			//if(success)
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

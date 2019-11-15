@@ -24,11 +24,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MetaDecompiler implements Decompiler {
-
+	boolean test = false;
 	boolean bestNotAssembleWhenUnnecessary = false;
 	File tmpOutputDir = new File("meta-dc");
 
 	public MetaDecompiler(List<Decompiler> decompilers) {
+		this.decompilers = decompilers;
+		cleanTmpDir();
+	}
+
+	public MetaDecompiler(List<Decompiler> decompilers, boolean test) {
+		this.test = test;
 		this.decompilers = decompilers;
 		cleanTmpDir();
 	}
@@ -50,6 +56,7 @@ public class MetaDecompiler implements Decompiler {
 
 	@Override
 	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
+		boolean firstPass = true;
 
 		boolean success = false;
 		Map<String, CtTypeMember> store = new HashMap<>();
@@ -59,8 +66,10 @@ public class MetaDecompiler implements Decompiler {
 		//launcherOutput.getEnvironment().setNoClasspath(true);
 		launcherOutput.setSourceOutputDirectory(outDir);
 		try {
-			ClassAPIVisitor cav = ClassAPIVisitor.readClass(in, launcherOutput.getFactory());
-			decompilations.add(new Decompilation(cav));
+			if(!test) {
+				ClassAPIVisitor cav = ClassAPIVisitor.readClass(in, launcherOutput.getFactory());
+				decompilations.add(new Decompilation(cav));
+			}
 			for (Decompiler dc : decompilers) {
 				try {
 					cleanTmpDir();
@@ -122,13 +131,17 @@ public class MetaDecompiler implements Decompiler {
 							String signature = Decompilation.signature(tm);
 							if(!store.containsKey(signature)) {
 								store.put(signature, tm);
+								if(!firstPass) {
+									System.out.println("[" + getName() + "][" + dc.getName() + "] new signature: " + signature);
+								}
 							}
 						}
 					}
 
 					//If not, let's store the new type members correctly decompiled (i.e. without decompilation error)
 					Decompilation decompilation = new Decompilation((CtClass) aa, problems, dc.getName());
-					decompilations.add(decompilations.size()-1, decompilation);
+					int index = test ? decompilations.size() : decompilations.size()-1;
+					decompilations.add(index, decompilation);
 
 					//List<Decompilation> solutions = new ArrayList<>(decompilations);
 					//solutions.sort(Comparator.comparing(Decompilation::initialProblems));
@@ -139,17 +152,10 @@ public class MetaDecompiler implements Decompiler {
 						if(r == 0) {
 							success = solution.isSolutionRecompilable(outDir, store, classpath);
 							if(success) break;
-							//solution.print(outDir,store);
-							//success = true;
-							//break;
 						}
 					}
 
-					//System.out.println("[" + getName() + "] Type contains " + typeMembers.values().stream().filter(l -> l.isEmpty()).count() + " remaining problems.");
-					//System.out.println("[" + getName() + "] Type contains " + typeMembers.keySet().size() + " type members.");
-
 					//If no incorrectly decompiled type member remain, call it a day.
-					//success = typeMembers.values().stream().map(l -> !l.isEmpty()).reduce(Boolean::logicalAnd).get();
 					System.out.println("[" + getName() + "] Type is correct ? " + success);
 
 
@@ -166,7 +172,7 @@ public class MetaDecompiler implements Decompiler {
 				if(success) {
 					break;
 				}
-
+				firstPass = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
