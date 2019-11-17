@@ -4,26 +4,25 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import se.kth.Decompiler;
 import se.kth.arl.Decompilation;
+import se.kth.arl.Logger;
+import se.kth.arl.Store;
 import se.kth.asm.ClassAPIVisitor;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtType;
-import spoon.reflect.declaration.CtTypeMember;
 import spoon.support.compiler.jdt.JDTBasedSpoonCompiler;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MetaDecompiler implements Decompiler {
+	public static boolean innerClassGranularity = true;
+
 	boolean test = false;
 	boolean bestNotAssembleWhenUnnecessary = false;
 	File tmpOutputDir = new File("meta-dc");
@@ -54,12 +53,20 @@ public class MetaDecompiler implements Decompiler {
 
 	List<Decompiler> decompilers;
 
+	public List<Decompiler> getDecompilers() {
+		return decompilers;
+	}
+
 	@Override
 	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
+		if(Logger.getInstance() == null) {
+			Logger.createInstance(this);
+		}
 		boolean firstPass = true;
 
 		boolean success = false;
-		Map<String, CtTypeMember> store = new HashMap<>();
+		//Map<String, CtTypeMember> store = new HashMap<>();
+		Store store = new Store();
 		List<Decompilation> decompilations = new ArrayList<>();
 
 		final Launcher launcherOutput = new Launcher();
@@ -125,18 +132,21 @@ public class MetaDecompiler implements Decompiler {
 					}
 
 					//Update store with new solutions
-					List<CtTypeMember> tms = aa.getTypeMembers();
+					/*List<CtTypeMember> tms = aa.getTypeMembers();
 					for(CtTypeMember tm: tms) {
 						if(!Decompilation.hasProblem(problems, tm)) {
 							String signature = Decompilation.signature(tm);
-							if(!store.containsKey(signature)) {
-								store.put(signature, tm);
+							//if(!store.containsKey(signature)) {
+							if(!store.containsFragment(signature)) {
+								//store.put(signature, tm);
+								store.addFragment(signature,dc.getName(),tm);
 								if(!firstPass) {
 									System.out.println("[" + getName() + "][" + dc.getName() + "] new signature: " + signature);
 								}
 							}
 						}
-					}
+					}*/
+					store.update((CtClass) aa,problems,dc.getName());
 
 					//If not, let's store the new type members correctly decompiled (i.e. without decompilation error)
 					Decompilation decompilation = new Decompilation((CtClass) aa, problems, dc.getName());
@@ -174,8 +184,26 @@ public class MetaDecompiler implements Decompiler {
 				}
 				firstPass = false;
 			}
+			if(!success) {
+				System.out.println("[" + getName() + "][Second round] -------------------------------------------");
+				store.rotate();
+				for(Decompilation solution: decompilations) {
+					if(solution.doomed) {
+						solution.doomed = false;
+						int r = solution.remainingProblems(store);
+						System.out.println("[" + getName() + "][Second round] " + solution.decompilerName + "'s solution contains " + r + " remaining problems.");
+						if(r == 0) {
+							success = solution.isSolutionRecompilable(outDir, store, classpath);
+							if(success) break;
+						}
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if(!success) {
+			Logger.getInstance().logFailure(cl,getName());
 		}
 		return success;
 	}

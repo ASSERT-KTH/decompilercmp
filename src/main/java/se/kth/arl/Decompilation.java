@@ -3,6 +3,7 @@ package se.kth.arl;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import se.kth.asm.ClassAPIVisitor;
+import se.kth.decompiler.MetaDecompiler;
 import spoon.Launcher;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.code.CtThrow;
@@ -29,8 +30,8 @@ import java.util.stream.Collectors;
 
 public class Decompilation {
 	CtClass src;
-	Map<Integer, String> rProblems;
-	boolean doomed = false;
+	Map<Position, String> rProblems;
+	public boolean doomed = false;
 	public String decompilerName;
 
 	public Decompilation(CtClass src, List<CategorizedProblem> problems, String decompilerName) {
@@ -38,13 +39,14 @@ public class Decompilation {
 		this.decompilerName = decompilerName;
 
 		rProblems = new HashMap<>();
-		List<CtTypeMember> typeMembers = src.getTypeMembers();
+		registerProblems(src, problems);
+		/*List<CtTypeMember> typeMembers = src.getTypeMembers();
 		for(int i = 0; i < typeMembers.size(); i++) {
 			CtTypeMember tm = typeMembers.get(i);
 			if(hasProblem(problems, tm)) {
-				rProblems.put(i, signature(tm));
+				rProblems.put(new SimplePosition(i), signature(tm));
 			}
-		}
+		}*/
 		if(!problems.isEmpty() && rProblems.isEmpty()) {
 			//There are problem with the Class structure that won't be overcome
 			doomed = true;
@@ -53,6 +55,23 @@ public class Decompilation {
 			System.out.println("[" + decompilerName + "] Weird!!!!!!!!!!!!!! ------------------");
 		}
 	}
+
+	private void registerProblems(CtClass src, List<CategorizedProblem> problems) {
+		List<CtTypeMember> typeMembers = src.getTypeMembers();
+		for(int i = 0; i < typeMembers.size(); i++) {
+			CtTypeMember tm = typeMembers.get(i);
+			if(MetaDecompiler.innerClassGranularity && tm instanceof CtClass) {
+				registerProblems((CtClass) tm, problems);
+			} else {
+				if (hasProblem(problems, tm)) {
+					//Position p = new SimplePosition(i);
+					Position p = new NestedPosition(src.getQualifiedName(), i);
+					rProblems.put(p, signature(tm));
+				}
+			}
+		}
+	}
+
 
 	public Decompilation(ClassAPIVisitor v) {
 		this.src = v.toBuild;
@@ -68,7 +87,7 @@ public class Decompilation {
 					src.getFactory().Type().BOOLEAN_PRIMITIVE,
 					"placeHolderFieldN" + i);
 			typeMembers.add(i, placeholder);
-			rProblems.put(i, signature);
+			rProblems.put(new SimplePosition(i), signature);
 			i++;
 		}
 		src.setTypeMembers(typeMembers);
@@ -78,18 +97,21 @@ public class Decompilation {
 		return rProblems.size();
 	}
 
-	public int remainingProblems(Map<String, CtTypeMember> store) {
+	//public int remainingProblems(Map<String, CtTypeMember> store) {
+	public int remainingProblems(Store store) {
 		if(doomed) return 666;
 		int remainingProblems = rProblems.size();
-		for (Map.Entry<Integer, String> problem: rProblems.entrySet()) {
-			if(store.containsKey(problem.getValue())) {
+		for (Map.Entry<Position, String> problem: rProblems.entrySet()) {
+			//if(store.containsKey(problem.getValue())) {
+			if(store.containsFragment(problem.getValue())) {
 				remainingProblems--;
 			}
 		}
 		return remainingProblems;
 	}
 
-	public void print(File outputDir, Map<String, CtTypeMember> store) {
+	//public void print(File outputDir, Map<String, CtTypeMember> store) {
+	public void print(File outputDir, Store store) {//} throws NoSuchInnerClassException {
 
 		final Launcher outputLauncher = new Launcher();
 		outputLauncher.setSourceOutputDirectory(outputDir);
@@ -101,10 +123,15 @@ public class Decompilation {
 		base.setSuperInterfaces(src.getSuperInterfaces());
 		base.setFormalCtTypeParameters(src.getFormalCtTypeParameters());
 		List<CtTypeMember> typeMembers = new ArrayList<>(src.getTypeMembers());
-		for (Map.Entry<Integer, String> problem: rProblems.entrySet()) {
-			typeMembers.set(problem.getKey(),store.get(problem.getValue()));
-		}
 		base.setTypeMembers(typeMembers);
+		for (Map.Entry<Position, String> problem: rProblems.entrySet()) {
+			//typeMembers.set(problem.getKey(),store.getFragment(problem.getValue()));
+			if(!problem.getKey().reachable(base)) {
+				System.err.println("ohoh");
+			}
+			problem.getKey().putAt(base, store.getFragment(problem.getValue()));
+		}
+		//base.setTypeMembers(typeMembers);
 		Factory factory = base.getFactory();
 		CompilationUnit cu = factory.createCompilationUnit();
 
@@ -116,18 +143,22 @@ public class Decompilation {
 				e.setPosition(new PartialSourcePositionImpl(cu));
 			}
 		});
+		//outputLauncher.setOutputFilter(new String[]{base.getQualifiedName()});
 
 		outputLauncher.prettyprint();
 	}
 
-	public boolean isSolutionRecompilable(File outputDir, Map<String, CtTypeMember> store, String[] classpath) {
-		print(outputDir, store);
+	//public boolean isSolutionRecompilable(File outputDir, Map<String, CtTypeMember> store, String[] classpath) {
+	public boolean isSolutionRecompilable(File outputDir, Store store, String[] classpath) {
 		boolean success = false;
 
 		String filePath = outputDir.getAbsolutePath() + "/" + src.getQualifiedName().replace(".", "/") + ".java";
 		try {
+			print(outputDir, store);
+
 			Launcher testLauncher = new Launcher();
-			testLauncher.addInputResource(outputDir.getAbsolutePath());
+			//testLauncher.addInputResource(outputDir.getAbsolutePath())
+			testLauncher.addInputResource(filePath);
 			testLauncher.getEnvironment().setSourceClasspath(classpath);
 			testLauncher.buildModel();
 			JDTBasedSpoonCompiler compiler = (JDTBasedSpoonCompiler) testLauncher.getModelBuilder();
@@ -138,7 +169,13 @@ public class Decompilation {
 					.filter(p -> new String(p.getOriginatingFileName()).equals(filePath))
 					.collect(Collectors.toList());
 			success = problems.isEmpty();
-			//if(success)
+
+			if(success) {
+				//log
+				Logger.getInstance().log(src.getQualifiedName(), decompilerName, success,
+						Logger.getFragmentOrigins(rProblems,store, src.getTypeMembers().size(), decompilerName)
+				);
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -191,14 +228,15 @@ public class Decompilation {
 	}
 
 	public static String signature(CtTypeMember tm) {
+		String className = tm.getParent(CtClass.class).getQualifiedName();
 		if(tm instanceof CtField) {
-			return tm.getParent(CtType.class).getQualifiedName() + "#" + tm.getSimpleName();
+			return className + "." + tm.getSimpleName();
 		} else if (tm instanceof CtType) {
 			return ((CtType) tm).getQualifiedName();
 		//} else if (tm instanceof CtAnonymousExecutable) {
 		//	return "<clinit>()";
 		} else {
-			return ((CtExecutable) tm).getSignature();
+			return className + "#" + ((CtExecutable) tm).getSignature();
 		}
 	}
 }

@@ -2,6 +2,7 @@ package se.kth.decompiler;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -26,7 +27,6 @@ public class MetaDecompilerTest {
 		if(testDir.exists()) {
 			testDir.delete();
 		}
-
 	}
 
 	@Test
