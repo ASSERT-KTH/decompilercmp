@@ -14,19 +14,23 @@ import java.util.stream.Collectors;
 public class Logger {
 	static File logFile = new File("meta-dc-logs.csv");
 	static Logger instance;
+	boolean test;
 
 	List<String> decompilers;
 
-	public static void createInstance(MetaDecompiler dc) {
+	public static void createInstance(MetaDecompiler dc, boolean test) {
 		instance = new Logger();
 		instance.decompilers = dc.getDecompilers().stream().map(d -> d.getName()).collect(Collectors.toList());
-		try {
-			if(!logFile.exists()) {
-				String dcs = dc.getDecompilers().stream().map(d -> d.getName()).collect(Collectors.joining(","));
-				FileUtils.write(logFile, "className,mainSolution,perceivedSuccess," + dcs + "\n", Charset.defaultCharset(), false);
+		instance.test = test;
+		if(!instance.test) {
+			try {
+				if (!logFile.exists()) {
+					String dcs = dc.getDecompilers().stream().map(d -> d.getName()).collect(Collectors.joining(","));
+					FileUtils.write(logFile, "className,mainSolution,perceivedSuccess," + dcs + "\n", Charset.defaultCharset(), false);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -39,20 +43,40 @@ public class Logger {
 	}
 
 	public void log(String className, String decompiler, boolean perceivedSuccess, Map<String, Integer> fragmentOrigins) {
-		try {
-			String dcs = fragmentOrigins.values().stream().map(i -> i.toString()).collect(Collectors.joining(","));
-			FileUtils.write(logFile, className + "," + decompiler + "," + perceivedSuccess +"," + dcs + "\n", Charset.defaultCharset(), true);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(!instance.test) {
+			try {
+				String dcs = fragmentOrigins.values().stream().map(i -> i.toString()).collect(Collectors.joining(","));
+				FileUtils.write(logFile, className + "," + decompiler + "," + perceivedSuccess + "," + dcs + "\n", Charset.defaultCharset(), true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public void logFailure(String className, String decompiler) {
-		try {
-			String dcs = decompilers.stream().map(dc -> "0").collect(Collectors.joining(","));
-			FileUtils.write(logFile, className + "," + decompiler + ",false," + dcs + "\n", Charset.defaultCharset(), true);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(!instance.test) {
+			try {
+				String dcs = decompilers.stream().map(dc -> "0").collect(Collectors.joining(","));
+				FileUtils.write(logFile, className + "," + decompiler + ",false," + dcs + "\n", Charset.defaultCharset(), true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void logNonClass(String className, String decompiler, int nbTypeMembers) {
+		if(!instance.test) {
+			try {
+				String dcs = nbTypeMembers + "";
+				if(decompilers.size() > 1) {
+					for(int i = 1; i < decompilers.size(); i++) {
+						dcs += ",0";
+					}
+				}
+				FileUtils.write(logFile, className + "," + decompiler + ",true," + dcs + "\n", Charset.defaultCharset(), true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

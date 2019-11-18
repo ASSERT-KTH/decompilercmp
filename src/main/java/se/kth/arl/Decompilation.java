@@ -166,7 +166,7 @@ public class Decompilation {
 			List<CategorizedProblem> problems = compiler.getProblems()
 					.stream()
 					.filter(p -> p.isError())
-					.filter(p -> new String(p.getOriginatingFileName()).equals(filePath))
+			//		.filter(p -> new String(p.getOriginatingFileName()).equals(filePath))
 					.collect(Collectors.toList());
 			success = problems.isEmpty();
 

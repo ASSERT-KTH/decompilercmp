@@ -3,16 +3,20 @@ package se.kth;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import se.kth.decompiler.CFR;
+import se.kth.decompiler.Dava;
 import se.kth.decompiler.Fernflower;
 import se.kth.decompiler.JADX;
 import se.kth.decompiler.JDCore;
 import se.kth.decompiler.JDGui;
 import se.kth.decompiler.Jode;
+import se.kth.decompiler.Krakatau;
+import se.kth.decompiler.MetaDecompiler;
 import se.kth.decompiler.Procyon;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +35,20 @@ public class MetaDecompile extends Project {
 	public MetaDecompile(String pathToProject, String pathToSources, String compilerId) {
 		super(pathToProject,pathToSources,compilerId);
 		decompilerOrder = new ArrayList<>();
+
+		decompilerOrder.add(new MetaDecompiler(
+						Arrays.asList(
+								new Procyon(),
+								new CFR(),
+								new Fernflower(),
+								new JDCore(),
+								new JADX(),
+								new Jode(),
+								new Dava(),
+								new Krakatau()
+						)
+				)
+		);
 
 		decompilerOrder.add(new CFR());//Best quality first
 		decompilerOrder.add(new Procyon());

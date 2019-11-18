@@ -60,7 +60,7 @@ public class MetaDecompiler implements Decompiler {
 	@Override
 	public boolean decompile(File in, File outDir, String cl, String[] classpath) {
 		if(Logger.getInstance() == null) {
-			Logger.createInstance(this);
+			Logger.createInstance(this, test);
 		}
 		boolean firstPass = true;
 
@@ -109,6 +109,7 @@ public class MetaDecompiler implements Decompiler {
 					if(!(aa instanceof CtClass)) {
 						File toRemove = new File(tmpOutputDir,cl + ".java");
 						FileUtils.moveFile(toRemove, new File(outDir.getAbsolutePath() + "/" + cl + ".java"));
+						Logger.getInstance().logNonClass(cl,getName(),aa.getTypeMembers().size());
 						return true;
 					}
 
@@ -128,6 +129,7 @@ public class MetaDecompiler implements Decompiler {
 						System.out.println("[" + getName() + "] Use " + dc.getName() + "'s solution.");
 						File toRemove = new File(tmpOutputDir,cl + ".java");
 						FileUtils.moveFile(toRemove, new File(outDir.getAbsolutePath() + "/" + cl + ".java"));
+						Logger.getInstance().logNonClass(cl,getName(),aa.getTypeMembers().size());
 						return true;
 					}
 
