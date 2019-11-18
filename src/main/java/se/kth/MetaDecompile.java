@@ -83,6 +83,9 @@ public class MetaDecompile extends Project {
 		//mvn compile original
 		compile(originalDir, true);
 
+		//read classpath
+		buildClassPath(originalDir);
+
 
 		if(!debug) {
 			report = new File(outputDir, projectName + ":Meta:" + compilerId + ":report.csv");

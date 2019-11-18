@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+PADDING="                     "
 HEADER="\t\t"
 #line
 HEADER2="                     "
@@ -19,6 +20,10 @@ for overd in $(ls report | cut -d ':' -f2 | sort | uniq)
 do
 	dname=$(echo $overd | sed 's/-2.5.0.Final//' | sed 's/-pre1//')
 	LINE=" $dname\t"
+
+	#Padding
+	LINE="$LINE ${PADDING:${#LINE}}"
+	
 	#column
 	for overp in $(ls report | cut -d ':' -f1 | sort | uniq)
 	do
