@@ -1,11 +1,19 @@
 ## Decompiler Comparator
 
-The aim of this project is compare the different java decompiler currently available. To do so it use a java maven project for which the sources are provided and attempt to decompile recompile classes one by one.
+The aim of this project is compare java decompilers, see [The Strengths and Behavioral Quirks of Java Bytecode Decompilers](http://arxiv.org/pdf/1908.06895).
 
-Optional Prerequisites:
- * run [yajta](https://github.com/castor-software/yajta) in Tie mode to collect information on which tests to run for each class. (Put the `tie-report.json` in the root of the targeted project).
+```bibtex
+@inproceedings{arXiv-1908.06895,
+ title = {The Strengths and Behavioral Quirks of Java Bytecode Decompilers},
+ booktitle = {Proceedings of the 19th IEEE International Working Conference on
+  Source Code Analysis and Manipulation (SCAM )},
+ year = {2019},
+ author = {Nicolas Harrand and César Soto-Valero and Martin Monperrus and Benoit Baudry},
+ url = {http://arxiv.org/pdf/1908.06895},
+}
+```
 
-Usage:
+## Usage
 
 ```bash
 # Run decomiler -> Ast diff -> compiler -> test on each class
@@ -37,6 +45,9 @@ Note that if the targeted project supports it, eclipse compiler can be used inst
 ```bash
 java -cp decompilercmp.jar se.kth.DecompilerComparator -p /path/to/test/project -d DecompilerName -j eclipse
 ```
+
+Optional: run [yajta](https://github.com/castor-software/yajta) in Tie mode to collect information on which tests to run for each class. (Put the `tie-report.json` in the root of the targeted project).
+
 
 ## Complete command line help
 
