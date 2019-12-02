@@ -77,6 +77,7 @@ Available decompilers:
 		CFR-0.141
 		Krakatau
 		JD-GUI-1.4.1
+		Arlecchino
 
 ```
 
