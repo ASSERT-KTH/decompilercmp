@@ -1,6 +1,6 @@
 ## Decompiler Comparator
 
-The aim of this project is compare java decompilers, see [The Strengths and Behavioral Quirks of Java Bytecode Decompilers](http://arxiv.org/pdf/1908.06895).
+The aim of this project is compare java decompilers, see [The Strengths and Behavioral Quirks of Java Bytecode Decompilers](http://arxiv.org/pdf/1908.06895) ([doi:10.1109/scam.2019.00019](https://doi.org/10.1109/scam.2019.00019)).
 
 ```bibtex
 @inproceedings{arXiv-1908.06895,
@@ -9,6 +9,7 @@ The aim of this project is compare java decompilers, see [The Strengths and Beha
   Source Code Analysis and Manipulation (SCAM )},
  year = {2019},
  author = {Nicolas Harrand and César Soto-Valero and Martin Monperrus and Benoit Baudry},
+ doi = {10.1109/scam.2019.00019},
  url = {http://arxiv.org/pdf/1908.06895},
 }
 ```
